@@ -9,6 +9,7 @@
  */
 
 const User = require('../models/User');
+const db = require('../config/database');
 const Role = require('../models/Role');
 const authService = require('./authService');
 const emailService = require('./emailService');
@@ -159,7 +160,7 @@ class UserService {
       await user.save();
 
       // Revocar todos los tokens por seguridad
-      await authService.revokeAllUserTokens(userId);
+      await user.revokeAllRefreshTokens();
 
       // Enviar notificación de seguridad
       try {
@@ -218,7 +219,7 @@ class UserService {
       await user.save();
 
       // Revocar todos los tokens del usuario
-      await authService.revokeAllUserTokens(userId);
+      await user.revokeAllRefreshTokens();
 
       // Enviar notificación
       try {
@@ -275,11 +276,42 @@ class UserService {
       throw error;
     }
   }
+  /**
+   * Eliminar usuario (soft delete)
+   */
+  async deleteUser(userId) {
+    try {
+      // Verificar existencia
+      const user = await User.findById(userId);
+      if (!user) {
+        const error = new Error('Usuario no encontrado');
+        error.statusCode = 404;
+        throw error;
+      }
+      // Hard delete: eliminar registro de la base de datos
+      const query = 'DELETE FROM "user" WHERE id = $1';
+      await db.query(query, [userId]);
+      // Revocar todos los tokens del usuario
+      await user.revokeAllRefreshTokens();
+      logger.info('Usuario eliminado', { userId });
+      return;
+    } catch (error) {
+      logger.error('Error eliminando usuario:', error);
+      throw error;
+    }
+  }
 
   /**
-   * Obtener estadísticas de usuarios
-   */
-  async getUserStats() {
+      // Eliminar registro físicamente de la tabla
+      // Revocar todos los tokens del usuario antes de borrar
+      await user.revokeAllRefreshTokens();
+      const deleteQuery = 'DELETE FROM "user" WHERE id = $1';
+      const result = await db.query(deleteQuery, [userId]);
+      if (result.rowCount === 0) {
+        const error = new Error('Usuario no encontrado');
+        error.statusCode = 404;
+        throw error;
+      }
     try {
       const stats = await User.getStats();
       

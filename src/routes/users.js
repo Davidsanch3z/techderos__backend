@@ -130,10 +130,21 @@ router.patch('/:id/deactivate',
  * @desc    Activar usuario específico
  * @access  Private (Admin only)
  */
-router.patch('/:id/activate',
+ router.patch('/:id/activate',
   requireAuth,
   requireRole(['administrador']),
   userController.activateUser
+ );
+
+/**
+ * @route   DELETE /api/users/:id
+ * @desc    Eliminar usuario específico
+ * @access  Private (Admin only)
+ */
+router.delete('/:id',
+  requireAuth,
+  requireRole(['administrador']),
+  userController.deleteUser
 );
 
 module.exports = router;

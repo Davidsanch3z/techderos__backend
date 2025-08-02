@@ -15,6 +15,8 @@ require('dotenv').config();
 
 const logger = require('./utils/logger');
 const { connectDatabase } = require('./config/database');
+const history = require('connect-history-api-fallback');
+const path = require('path');
 
 // Importar rutas
 const authRoutes = require('./routes/auth');

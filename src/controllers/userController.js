@@ -264,6 +264,23 @@ class UserController {
       );
     }
   }
+  /**
+   * Eliminar usuario específico (solo admin)
+   * DELETE /api/users/:id
+   */
+  async deleteUser(req, res) {
+    try {
+      const { id } = req.params;
+      await userService.deleteUser(id);
+      logger.info('Usuario eliminado por admin', { userId: id, adminId: req.user.id });
+      res.json(formatResponse(true, 'Usuario eliminado exitosamente'));
+    } catch (error) {
+      logger.error('Error eliminando usuario:', error);
+      res.status(error.statusCode || 400).json(
+        formatResponse(false, error.message)
+      );
+    }
+  }
 }
 
 module.exports = new UserController();
