@@ -3,7 +3,7 @@ const inventoryService = require("../services/inventoryService");
 
 class InventoryController {
   /**
-   * Registro de nuevo usuario
+   * Returns a list of inventory items for the authenticated user
    * GET /api/inventory/list
    */
   async list(req, res) {
@@ -13,7 +13,7 @@ class InventoryController {
   }
 
   /**
-   * Registro de nuevo usuario
+   * Retrieve a specific inventory item by ID for the authenticated user
    * GET /api/inventory/get/:id
    */
   async retrieve(req, res) {
@@ -30,7 +30,7 @@ class InventoryController {
   }
 
   /**
-   * Registro de nuevo usuario
+   * Partially update an inventory item by ID for the authenticated user
    * PATCH /api/inventory/update/:id
    */
   async partialUpdate(req, res) {
@@ -47,7 +47,7 @@ class InventoryController {
   }
 
   /**
-   * Registro de nuevo usuario
+   * Delete an inventory item by ID for the authenticated user
    * DELETE /api/inventory/delete/:id
    */
   async delete(req, res) {
@@ -69,7 +69,7 @@ class InventoryController {
   }
 
   /**
-   * Registro de nuevo usuario
+   * Create a new inventory item for the authenticated user
    * POST /api/inventory/create
    */
   async create(req, res) {
