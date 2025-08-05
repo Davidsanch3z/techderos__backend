@@ -3,9 +3,9 @@
 -- ==============================================
 -- Script ejecutado automáticamente al crear el container
 -- Crea las estructuras iniciales de la base de datos
-
 -- Crear extensiones necesarias
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- ==============================================
@@ -19,6 +19,15 @@ CREATE TABLE IF NOT EXISTS roles (
     activo BOOLEAN DEFAULT TRUE,
     fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     fecha_actualizacion TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS inventory_pd (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    quantity INT NOT NULL,
+    category VARCHAR(100),
+    user_id VARCHAR(100)
 );
 
 -- Crear índice en nombre de rol
@@ -52,10 +61,15 @@ CREATE TABLE IF NOT EXISTS usuarios (
 
 -- Crear índices para optimizar consultas
 CREATE INDEX IF NOT EXISTS idx_usuarios_email ON usuarios(email);
+
 CREATE INDEX IF NOT EXISTS idx_usuarios_rol_id ON usuarios(rol_id);
+
 CREATE INDEX IF NOT EXISTS idx_usuarios_activo ON usuarios(activo);
+
 CREATE INDEX IF NOT EXISTS idx_usuarios_email_verificado ON usuarios(email_verificado);
+
 CREATE INDEX IF NOT EXISTS idx_usuarios_token_verificacion ON usuarios(token_verificacion);
+
 CREATE INDEX IF NOT EXISTS idx_usuarios_token_reset ON usuarios(token_reset_password);
 
 -- ==============================================
@@ -76,8 +90,11 @@ CREATE TABLE IF NOT EXISTS sesiones (
 
 -- Crear índices para sesiones
 CREATE INDEX IF NOT EXISTS idx_sesiones_usuario_id ON sesiones(usuario_id);
+
 CREATE INDEX IF NOT EXISTS idx_sesiones_refresh_token ON sesiones(refresh_token_hash);
+
 CREATE INDEX IF NOT EXISTS idx_sesiones_activa ON sesiones(activa);
+
 CREATE INDEX IF NOT EXISTS idx_sesiones_expiracion ON sesiones(fecha_expiracion);
 
 -- ==============================================
@@ -98,62 +115,69 @@ CREATE TABLE IF NOT EXISTS auditoria (
 
 -- Crear índices para auditoría
 CREATE INDEX IF NOT EXISTS idx_auditoria_usuario_id ON auditoria(usuario_id);
+
 CREATE INDEX IF NOT EXISTS idx_auditoria_accion ON auditoria(accion);
+
 CREATE INDEX IF NOT EXISTS idx_auditoria_fecha ON auditoria(fecha);
+
 CREATE INDEX IF NOT EXISTS idx_auditoria_recurso ON auditoria(recurso, recurso_id);
 
 -- ==============================================
 -- FUNCIONES AUXILIARES
 -- ==============================================
-
 -- Función para actualizar fecha_actualizacion automáticamente
-CREATE OR REPLACE FUNCTION actualizar_fecha_modificacion()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.fecha_actualizacion = NOW();
-    RETURN NEW;
+CREATE
+OR REPLACE FUNCTION actualizar_fecha_modificacion() RETURNS TRIGGER AS $ $ BEGIN NEW.fecha_actualizacion = NOW();
+
+RETURN NEW;
+
 END;
-$$ language 'plpgsql';
+
+$ $ language 'plpgsql';
 
 -- ==============================================
 -- TRIGGERS
 -- ==============================================
-
 -- Trigger para actualizar fecha_actualizacion en roles
 DROP TRIGGER IF EXISTS trigger_roles_fecha_actualizacion ON roles;
-CREATE TRIGGER trigger_roles_fecha_actualizacion
-    BEFORE UPDATE ON roles
-    FOR EACH ROW
-    EXECUTE FUNCTION actualizar_fecha_modificacion();
+
+CREATE TRIGGER trigger_roles_fecha_actualizacion BEFORE
+UPDATE
+    ON roles FOR EACH ROW EXECUTE FUNCTION actualizar_fecha_modificacion();
 
 -- Trigger para actualizar fecha_actualizacion en usuarios
 DROP TRIGGER IF EXISTS trigger_usuarios_fecha_actualizacion ON usuarios;
-CREATE TRIGGER trigger_usuarios_fecha_actualizacion
-    BEFORE UPDATE ON usuarios
-    FOR EACH ROW
-    EXECUTE FUNCTION actualizar_fecha_modificacion();
+
+CREATE TRIGGER trigger_usuarios_fecha_actualizacion BEFORE
+UPDATE
+    ON usuarios FOR EACH ROW EXECUTE FUNCTION actualizar_fecha_modificacion();
 
 -- ==============================================
 -- FUNCIÓN PARA LIMPIAR SESIONES EXPIRADAS
 -- ==============================================
-CREATE OR REPLACE FUNCTION limpiar_sesiones_expiradas()
-RETURNS INTEGER AS $$
-DECLARE
-    sesiones_eliminadas INTEGER;
+CREATE
+OR REPLACE FUNCTION limpiar_sesiones_expiradas() RETURNS INTEGER AS $ $ DECLARE sesiones_eliminadas INTEGER;
+
 BEGIN
-    DELETE FROM sesiones 
-    WHERE fecha_expiracion < NOW() OR activa = FALSE;
-    
-    GET DIAGNOSTICS sesiones_eliminadas = ROW_COUNT;
-    
-    RETURN sesiones_eliminadas;
+DELETE FROM
+    sesiones
+WHERE
+    fecha_expiracion < NOW()
+    OR activa = FALSE;
+
+GET DIAGNOSTICS sesiones_eliminadas = ROW_COUNT;
+
+RETURN sesiones_eliminadas;
+
 END;
-$$ LANGUAGE plpgsql;
+
+$ $ LANGUAGE plpgsql;
 
 -- ==============================================
 -- FUNCIÓN PARA REGISTRAR AUDITORÍA
 -- ==============================================
-CREATE OR REPLACE FUNCTION registrar_auditoria(
+CREATE
+OR REPLACE FUNCTION registrar_auditoria(
     p_usuario_id UUID,
     p_accion VARCHAR(100),
     p_recurso VARCHAR(100) DEFAULT NULL,
@@ -162,28 +186,44 @@ CREATE OR REPLACE FUNCTION registrar_auditoria(
     p_datos_nuevos JSONB DEFAULT NULL,
     p_ip_address INET DEFAULT NULL,
     p_user_agent TEXT DEFAULT NULL
-)
-RETURNS UUID AS $$
-DECLARE
-    auditoria_id UUID;
+) RETURNS UUID AS $ $ DECLARE auditoria_id UUID;
+
 BEGIN
-    INSERT INTO auditoria (
-        usuario_id, accion, recurso, recurso_id,
-        datos_anteriores, datos_nuevos, ip_address, user_agent
-    ) VALUES (
-        p_usuario_id, p_accion, p_recurso, p_recurso_id,
-        p_datos_anteriores, p_datos_nuevos, p_ip_address, p_user_agent
+INSERT INTO
+    auditoria (
+        usuario_id,
+        accion,
+        recurso,
+        recurso_id,
+        datos_anteriores,
+        datos_nuevos,
+        ip_address,
+        user_agent
+    )
+VALUES
+    (
+        p_usuario_id,
+        p_accion,
+        p_recurso,
+        p_recurso_id,
+        p_datos_anteriores,
+        p_datos_nuevos,
+        p_ip_address,
+        p_user_agent
     ) RETURNING id INTO auditoria_id;
-    
-    RETURN auditoria_id;
+
+RETURN auditoria_id;
+
 END;
-$$ LANGUAGE plpgsql;
+
+$ $ LANGUAGE plpgsql;
 
 -- ==============================================
 -- VISTA PARA USUARIOS CON ROL
 -- ==============================================
-CREATE OR REPLACE VIEW vista_usuarios AS
-SELECT 
+CREATE
+OR REPLACE VIEW vista_usuarios AS
+SELECT
     u.id,
     u.email,
     u.nombre,
@@ -199,20 +239,29 @@ SELECT
     r.nombre as rol_nombre,
     r.descripcion as rol_descripcion,
     r.permisos as rol_permisos
-FROM usuarios u
-LEFT JOIN roles r ON u.rol_id = r.id;
+FROM
+    usuarios u
+    LEFT JOIN roles r ON u.rol_id = r.id;
 
 -- ==============================================
 -- COMENTARIOS EN TABLAS
 -- ==============================================
 COMMENT ON TABLE roles IS 'Roles del sistema con permisos asociados';
+
 COMMENT ON TABLE usuarios IS 'Usuarios registrados en el sistema';
+
 COMMENT ON TABLE sesiones IS 'Sesiones activas y refresh tokens';
+
 COMMENT ON TABLE auditoria IS 'Registro de auditoría de acciones del sistema';
 
 COMMENT ON COLUMN usuarios.password_hash IS 'Hash bcrypt de la contraseña';
+
 COMMENT ON COLUMN usuarios.intentos_login IS 'Contador de intentos fallidos de login';
+
 COMMENT ON COLUMN usuarios.bloqueado_hasta IS 'Fecha hasta la cual el usuario está bloqueado';
+
 COMMENT ON COLUMN usuarios.metadata IS 'Información adicional en formato JSON';
+
 COMMENT ON COLUMN sesiones.refresh_token_hash IS 'Hash del refresh token para seguridad';
+
 COMMENT ON COLUMN roles.permisos IS 'Array de permisos en formato JSON';
