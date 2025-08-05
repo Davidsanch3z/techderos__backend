@@ -22,6 +22,12 @@ class InventoryController {
 
     try {
       const result = await inventoryService.getInventory(userId, itemId);
+
+      if (!result) {
+        res.status(404).json({ error: "Not found" });
+        return
+      }
+
       res.status(200).json(result);
     } catch (err) {
       console.log(err);
@@ -34,7 +40,6 @@ class InventoryController {
    * PATCH /api/inventory/update/:id
    */
   async partialUpdate(req, res) {
-    const userId = req.user.id;
     const itemId = req.params.id;
 
     try {

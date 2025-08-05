@@ -8,9 +8,9 @@
  * - Gestión de roles (solo admin)
  */
 
-const userService = require('../services/userService');
-const logger = require('../utils/logger');
-const { formatResponse } = require('../utils/helpers');
+const userService = require("../services/userService");
+const logger = require("../utils/logger");
+const { formatResponse } = require("../utils/helpers");
 
 class UserController {
   /**
@@ -21,13 +21,13 @@ class UserController {
     try {
       const userId = req.user.id;
       const user = await userService.getUserById(userId);
-      
-      res.json(formatResponse(true, 'Perfil obtenido exitosamente', { user }));
+
+      res.json(formatResponse(true, "Perfil obtenido exitosamente", { user }));
     } catch (error) {
-      logger.error('Error obteniendo perfil:', error);
-      res.status(error.statusCode || 500).json(
-        formatResponse(false, error.message)
-      );
+      logger.error("Error obteniendo perfil:", error);
+      res
+        .status(error.statusCode || 500)
+        .json(formatResponse(false, error.message));
     }
   }
 
@@ -39,17 +39,19 @@ class UserController {
     try {
       const userId = req.user.id;
       const updateData = req.body;
-      
+
       const user = await userService.updateUser(userId, updateData);
-      
-      logger.info('Perfil actualizado', { userId });
-      
-      res.json(formatResponse(true, 'Perfil actualizado exitosamente', { user }));
-    } catch (error) {
-      logger.error('Error actualizando perfil:', error);
-      res.status(error.statusCode || 400).json(
-        formatResponse(false, error.message)
+
+      logger.info("Perfil actualizado", { userId });
+
+      res.json(
+        formatResponse(true, "Perfil actualizado exitosamente", { user })
       );
+    } catch (error) {
+      logger.error("Error actualizando perfil:", error);
+      res
+        .status(error.statusCode || 400)
+        .json(formatResponse(false, error.message));
     }
   }
 
@@ -61,23 +63,28 @@ class UserController {
     try {
       const userId = req.user.id;
       const { currentPassword, newPassword } = req.body;
-      
+
       if (!currentPassword || !newPassword) {
-        return res.status(400).json(
-          formatResponse(false, 'Contraseña actual y nueva contraseña requeridas')
-        );
+        return res
+          .status(400)
+          .json(
+            formatResponse(
+              false,
+              "Contraseña actual y nueva contraseña requeridas"
+            )
+          );
       }
 
       await userService.changePassword(userId, currentPassword, newPassword);
-      
-      logger.info('Contraseña cambiada', { userId });
-      
-      res.json(formatResponse(true, 'Contraseña cambiada exitosamente'));
+
+      logger.info("Contraseña cambiada", { userId });
+
+      res.json(formatResponse(true, "Contraseña cambiada exitosamente"));
     } catch (error) {
-      logger.error('Error cambiando contraseña:', error);
-      res.status(error.statusCode || 400).json(
-        formatResponse(false, error.message)
-      );
+      logger.error("Error cambiando contraseña:", error);
+      res
+        .status(error.statusCode || 400)
+        .json(formatResponse(false, error.message));
     }
   }
 
@@ -89,13 +96,13 @@ class UserController {
     try {
       const { name, email, password, rol } = req.body;
       const adminId = req.user.id;
-      
+
       // Verificar si el email ya existe
       const existingUser = await userService.getUserByEmail(email);
       if (existingUser) {
-        return res.status(400).json(
-          formatResponse(false, 'Ya existe un usuario con este email')
-        );
+        return res
+          .status(400)
+          .json(formatResponse(false, "Ya existe un usuario con este email"));
       }
 
       // Crear el usuario
@@ -103,30 +110,34 @@ class UserController {
         name,
         email,
         password,
-        rol: rol || 'usuario',
+        rol: rol || "usuario",
         isActive: true,
-        emailVerified: true // Los usuarios creados por admin están verificados
+        emailVerified: true, // Los usuarios creados por admin están verificados
       };
 
       const user = await userService.createUser(userData);
-      
-      logger.info('Usuario creado por admin', { 
-        createdUserId: user.id, 
+
+      logger.info("Usuario creado por admin", {
+        createdUserId: user.id,
         adminId,
-        userEmail: email 
+        userEmail: email,
       });
-      
+
       // Remover la contraseña de la respuesta
       const { password: _, ...userResponse } = user;
-      
-      res.status(201).json(
-        formatResponse(true, 'Usuario creado exitosamente', { user: userResponse })
-      );
+
+      res
+        .status(201)
+        .json(
+          formatResponse(true, "Usuario creado exitosamente", {
+            user: userResponse,
+          })
+        );
     } catch (error) {
-      logger.error('Error creando usuario:', error);
-      res.status(error.statusCode || 400).json(
-        formatResponse(false, error.message)
-      );
+      logger.error("Error creando usuario:", error);
+      res
+        .status(error.statusCode || 400)
+        .json(formatResponse(false, error.message));
     }
   }
 
@@ -137,23 +148,23 @@ class UserController {
   async getUsers(req, res) {
     try {
       const { page = 1, limit = 10, rol, status, search } = req.query;
-      
+
       const filters = {
         page: parseInt(page),
         limit: parseInt(limit),
         rol,
         status,
-        search
+        search,
       };
 
       const result = await userService.getUsers(filters);
-      
-      res.json(formatResponse(true, 'Usuarios obtenidos exitosamente', result));
+
+      res.json(formatResponse(true, "Usuarios obtenidos exitosamente", result));
     } catch (error) {
-      logger.error('Error obteniendo usuarios:', error);
-      res.status(error.statusCode || 500).json(
-        formatResponse(false, error.message)
-      );
+      logger.error("Error obteniendo usuarios:", error);
+      res
+        .status(error.statusCode || 500)
+        .json(formatResponse(false, error.message));
     }
   }
 
@@ -165,13 +176,13 @@ class UserController {
     try {
       const { id } = req.params;
       const user = await userService.getUserById(id);
-      
-      res.json(formatResponse(true, 'Usuario obtenido exitosamente', { user }));
+
+      res.json(formatResponse(true, "Usuario obtenido exitosamente", { user }));
     } catch (error) {
-      logger.error('Error obteniendo usuario:', error);
-      res.status(error.statusCode || 404).json(
-        formatResponse(false, error.message)
-      );
+      logger.error("Error obteniendo usuario:", error);
+      res
+        .status(error.statusCode || 404)
+        .json(formatResponse(false, error.message));
     }
   }
 
@@ -183,20 +194,22 @@ class UserController {
     try {
       const { id } = req.params;
       const updateData = req.body;
-      
+
       const user = await userService.updateUser(id, updateData);
-      
-      logger.info('Usuario actualizado por admin', { 
+
+      logger.info("Usuario actualizado por admin", {
         userId: id,
-        adminId: req.user.id 
+        adminId: req.user.id,
       });
-      
-      res.json(formatResponse(true, 'Usuario actualizado exitosamente', { user }));
-    } catch (error) {
-      logger.error('Error actualizando usuario:', error);
-      res.status(error.statusCode || 400).json(
-        formatResponse(false, error.message)
+
+      res.json(
+        formatResponse(true, "Usuario actualizado exitosamente", { user })
       );
+    } catch (error) {
+      logger.error("Error actualizando usuario:", error);
+      res
+        .status(error.statusCode || 400)
+        .json(formatResponse(false, error.message));
     }
   }
 
@@ -207,20 +220,20 @@ class UserController {
   async deactivateUser(req, res) {
     try {
       const { id } = req.params;
-      
+
       await userService.deactivateUser(id);
-      
-      logger.info('Usuario desactivado', { 
+
+      logger.info("Usuario desactivado", {
         userId: id,
-        adminId: req.user.id 
+        adminId: req.user.id,
       });
-      
-      res.json(formatResponse(true, 'Usuario desactivado exitosamente'));
+
+      res.json(formatResponse(true, "Usuario desactivado exitosamente"));
     } catch (error) {
-      logger.error('Error desactivando usuario:', error);
-      res.status(error.statusCode || 400).json(
-        formatResponse(false, error.message)
-      );
+      logger.error("Error desactivando usuario:", error);
+      res
+        .status(error.statusCode || 400)
+        .json(formatResponse(false, error.message));
     }
   }
 
@@ -231,20 +244,20 @@ class UserController {
   async activateUser(req, res) {
     try {
       const { id } = req.params;
-      
+
       await userService.activateUser(id);
-      
-      logger.info('Usuario activado', { 
+
+      logger.info("Usuario activado", {
         userId: id,
-        adminId: req.user.id 
+        adminId: req.user.id,
       });
-      
-      res.json(formatResponse(true, 'Usuario activado exitosamente'));
+
+      res.json(formatResponse(true, "Usuario activado exitosamente"));
     } catch (error) {
-      logger.error('Error activando usuario:', error);
-      res.status(error.statusCode || 400).json(
-        formatResponse(false, error.message)
-      );
+      logger.error("Error activando usuario:", error);
+      res
+        .status(error.statusCode || 400)
+        .json(formatResponse(false, error.message));
     }
   }
 
@@ -255,13 +268,15 @@ class UserController {
   async getUserStats(req, res) {
     try {
       const stats = await userService.getUserStats();
-      
-      res.json(formatResponse(true, 'Estadísticas obtenidas exitosamente', stats));
-    } catch (error) {
-      logger.error('Error obteniendo estadísticas:', error);
-      res.status(error.statusCode || 500).json(
-        formatResponse(false, error.message)
+
+      res.json(
+        formatResponse(true, "Estadísticas obtenidas exitosamente", stats)
       );
+    } catch (error) {
+      logger.error("Error obteniendo estadísticas:", error);
+      res
+        .status(error.statusCode || 500)
+        .json(formatResponse(false, error.message));
     }
   }
   /**
@@ -272,13 +287,16 @@ class UserController {
     try {
       const { id } = req.params;
       await userService.deleteUser(id);
-      logger.info('Usuario eliminado por admin', { userId: id, adminId: req.user.id });
-      res.json(formatResponse(true, 'Usuario eliminado exitosamente'));
+      logger.info("Usuario eliminado por admin", {
+        userId: id,
+        adminId: req.user.id,
+      });
+      res.json(formatResponse(true, "Usuario eliminado exitosamente"));
     } catch (error) {
-      logger.error('Error eliminando usuario:', error);
-      res.status(error.statusCode || 400).json(
-        formatResponse(false, error.message)
-      );
+      logger.error("Error eliminando usuario:", error);
+      res
+        .status(error.statusCode || 400)
+        .json(formatResponse(false, error.message));
     }
   }
 }
