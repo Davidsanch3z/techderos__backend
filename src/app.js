@@ -20,6 +20,7 @@ const { connectDatabase } = require("./config/database");
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/users");
 const inventoryRoutes = require("./routes/inventory");
+const salesRoutes = require("./routes/sales");
 
 // Crear aplicación Express
 const app = express();
@@ -61,6 +62,7 @@ app.get("/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/inventory", inventoryRoutes);
+app.use("/api/sales", salesRoutes);
 
 // Ruta de documentación API
 app.get("/api/docs", (req, res) => {

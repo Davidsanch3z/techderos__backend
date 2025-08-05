@@ -21,6 +21,18 @@ CREATE TABLE IF NOT EXISTS roles (
     fecha_actualizacion TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS sales_pd (
+    id SERIAL PRIMARY KEY,
+    date DATE NOT NULL,
+    customer VARCHAR(255) NOT NULL,
+    customer_email VARCHAR(255),
+    products TEXT NOT NULL,
+    payment_method VARCHAR(100) NOT NULL,
+    total DECIMAL(10, 2) NOT NULL,
+    user_id VARCHAR(255),
+    amount INTEGER DEFAULT 0
+);
+
 CREATE TABLE IF NOT EXISTS inventory_pd (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
