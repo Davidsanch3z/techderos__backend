@@ -39,7 +39,11 @@ CREATE TABLE IF NOT EXISTS inventory_pd (
     price DECIMAL(10, 2) NOT NULL,
     quantity INT NOT NULL,
     category VARCHAR(100),
-    user_id VARCHAR(100)
+    user_id VARCHAR(100),
+    supplier_name VARCHAR(100),
+    presentation VARCHAR(50),
+    expiration_date DATE,
+    profit_margin DECIMAL(5, 2)
 );
 
 -- Crear índice en nombre de rol
