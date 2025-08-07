@@ -25,7 +25,7 @@ class InventoryController {
 
       if (!result) {
         res.status(404).json({ error: "Not found" });
-        return
+        return;
       }
 
       res.status(200).json(result);
@@ -78,9 +78,18 @@ class InventoryController {
    * POST /api/inventory/create
    */
   async create(req, res) {
-    const { name, price, quantity, category } = req.body;
     const error = validateInventoryInput(req.body);
     const userId = req.user.id;
+    const {
+      name,
+      price,
+      quantity,
+      category,
+      supplierName,
+      presentation,
+      expirationDate,
+      profitMargin,
+    } = req.body;
 
     if (error) {
       return res.status(400).json({ error });
@@ -93,6 +102,10 @@ class InventoryController {
         quantity,
         category,
         userId,
+        supplierName,
+        presentation,
+        expirationDate,
+        profitMargin,
       });
 
       res.status(201).json(item);

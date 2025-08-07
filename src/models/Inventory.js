@@ -1,5 +1,4 @@
 const db = require("../config/database");
-const logger = require("../utils/logger");
 
 class Inventory {
   constructor(data = {}) {
@@ -9,6 +8,10 @@ class Inventory {
     this.quantity = data.quantity;
     this.category = data.category;
     this.userId = data.user_id;
+    this.supplierName = data.supplier_name;
+    this.presentation = data.presentation;
+    this.expirationDate = data.expiration_date;
+    this.profitMargin = data.profit_margin;
   }
 
   static findByUserIdAndItemId(userId, itemId) {
@@ -37,13 +40,38 @@ class Inventory {
       });
   }
 
-  static create({ name, price, quantity, category, userId }) {
+  static create({
+    name,
+    price,
+    quantity,
+    category,
+    userId,
+    supplierName,
+    presentation,
+    expirationDate,
+    profitMargin,
+  }) {
     const query = `
-      INSERT INTO "inventory_pd" (name, price, quantity, category, user_id)
-      VALUES ($1, $2, $3, $4, $5)
-      RETURNING *;
-    `;
-    const values = [name, price, quantity, category, userId];
+    INSERT INTO inventory_pd (
+      name, price, quantity, category, user_id,
+      supplier_name, presentation, expiration_date, profit_margin
+    )
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    RETURNING *;
+  `;
+
+    const values = [
+      name,
+      price,
+      quantity,
+      category,
+      userId,
+      supplierName,
+      presentation,
+      expirationDate,
+      profitMargin,
+    ];
+
     return db
       .query(query, values)
       .then((result) => new Inventory(result.rows[0]))
@@ -54,24 +82,41 @@ class Inventory {
   }
 
   static async updateById(id, data = {}) {
-    const { name, price, quantity, category } = data;
+    const {
+      name,
+      price,
+      quantity,
+      category,
+      supplierName,
+      presentation,
+      expirationDate,
+      profitMargin,
+    } = data;
 
     const query = `
-      UPDATE inventory_pd
-      SET
-        name = COALESCE($1, name),
-        price = COALESCE($2, price),
-        quantity = COALESCE($3, quantity),
-        category = COALESCE($4, category)
-      WHERE id = $5
-      RETURNING *;
-    `;
+    UPDATE inventory_pd
+    SET
+      name = COALESCE($1, name),
+      price = COALESCE($2, price),
+      quantity = COALESCE($3, quantity),
+      category = COALESCE($4, category),
+      supplier_name = COALESCE($5, supplier_name),
+      presentation = COALESCE($6, presentation),
+      expiration_date = COALESCE($7, expiration_date),
+      profit_margin = COALESCE($8, profit_margin)
+    WHERE id = $9
+    RETURNING *;
+  `;
 
     const values = [
       name ?? null,
       price ?? null,
       quantity ?? null,
       category ?? null,
+      supplierName ?? null,
+      presentation ?? null,
+      expirationDate ?? null,
+      profitMargin ?? null,
       id,
     ];
 
