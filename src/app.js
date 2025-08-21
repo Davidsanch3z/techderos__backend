@@ -21,6 +21,7 @@ const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/users");
 const inventoryRoutes = require("./routes/inventory");
 const salesRoutes = require("./routes/sales");
+const providersRoutes = require("./routes/providers");
 
 // Crear aplicación Express
 const app = express();
@@ -63,6 +64,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/inventory", inventoryRoutes);
 app.use("/api/sales", salesRoutes);
+app.use("/api/providers", providersRoutes);
 
 // Ruta de documentación API
 app.get("/api/docs", (req, res) => {

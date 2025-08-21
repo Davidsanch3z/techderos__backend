@@ -21,6 +21,18 @@ CREATE TABLE IF NOT EXISTS roles (
     fecha_actualizacion TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS providers (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(150) NOT NULL,
+    owner_name VARCHAR(150) NOT NULL,
+    phone_number VARCHAR(20),
+    whatsapp_number VARCHAR(20),
+    email VARCHAR(150),
+    address VARCHAR(255),
+    delivery_day DATE,
+    is_active BOOLEAN DEFAULT TRUE
+);
+
 CREATE TABLE IF NOT EXISTS sales_pd (
     id SERIAL PRIMARY KEY,
     date DATE NOT NULL,
