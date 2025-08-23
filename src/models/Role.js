@@ -133,27 +133,27 @@ class Role {
     }
   }
 
-  /**
-   * Los roles ya existen en la base de datos, así que no necesitamos crearlos
-   * Solo validamos que existan los roles básicos
-   */
-  static async initializeDefaultRoles() {
-    try {
-      logger.info('Verificando roles existentes...');
+  // /**
+  //  * Los roles ya existen en la base de datos, así que no necesitamos crearlos
+  //  * Solo validamos que existan los roles básicos
+  //  */
+  // static async initializeDefaultRoles() {
+  //   try {
+  //     logger.info('Verificando roles existentes...');
       
-      const roles = await Role.findAll();
-      logger.info(`Se encontraron ${roles.length} roles en la base de datos:`);
+  //     const roles = await Role.findAll();
+  //     logger.info(`Se encontraron ${roles.length} roles en la base de datos:`);
       
-      roles.forEach(role => {
-        logger.info(`- ${role.name} (${role.id}): ${role.description}`);
-      });
+  //     roles.forEach(role => {
+  //       logger.info(`- ${role.name} (${role.id}): ${role.description}`);
+  //     });
       
-      return true;
-    } catch (error) {
-      logger.error('Error verificando roles:', error);
-      throw error;
-    }
-  }
+  //     return true;
+  //   } catch (error) {
+  //     logger.error('Error verificando roles:', error);
+  //     throw error;
+  //   }
+  // }
 }
 
 module.exports = Role;

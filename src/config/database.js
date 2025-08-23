@@ -92,7 +92,7 @@ async function connectDatabase() {
     client.release();
     
     // Inicializar esquema si es necesario
-    await initializeSchema();
+    //await initializeSchema();
     
     return pool;
   } catch (error) {
@@ -113,100 +113,100 @@ async function initializeSchema() {
   try {
     const client = await pool.connect();
     
-    // Crear extensión UUID si no existe
-    await client.query('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"');
+    // // Crear extensión UUID si no existe
+    // await client.query('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"');
     
-    // Crear tabla de usuarios
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS users (
-        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-        nombre VARCHAR(100) NOT NULL,
-        email VARCHAR(255) UNIQUE NOT NULL,
-        password_hash VARCHAR(255) NOT NULL,
-        telefono VARCHAR(20),
-        tipo_negocio VARCHAR(50),
-        rol VARCHAR(50) DEFAULT 'tendero',
-        status VARCHAR(20) DEFAULT 'pending',
-        email_verified BOOLEAN DEFAULT false,
-        email_verification_token VARCHAR(255),
-        password_reset_token VARCHAR(255),
-        password_reset_expires TIMESTAMP,
-        last_login TIMESTAMP,
-        failed_login_attempts INTEGER DEFAULT 0,
-        locked_until TIMESTAMP,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
+    // // Crear tabla de usuarios
+    // await client.query(`
+    //   CREATE TABLE IF NOT EXISTS users (
+    //     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    //     nombre VARCHAR(100) NOT NULL,
+    //     email VARCHAR(255) UNIQUE NOT NULL,
+    //     password_hash VARCHAR(255) NOT NULL,
+    //     telefono VARCHAR(20),
+    //     tipo_negocio VARCHAR(50),
+    //     rol VARCHAR(50) DEFAULT 'tendero',
+    //     status VARCHAR(20) DEFAULT 'pending',
+    //     email_verified BOOLEAN DEFAULT false,
+    //     email_verification_token VARCHAR(255),
+    //     password_reset_token VARCHAR(255),
+    //     password_reset_expires TIMESTAMP,
+    //     last_login TIMESTAMP,
+    //     failed_login_attempts INTEGER DEFAULT 0,
+    //     locked_until TIMESTAMP,
+    //     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    //     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    //   )
+    // `);
 
-    // Crear tabla de roles
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS roles (
-        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-        nombre VARCHAR(50) UNIQUE NOT NULL,
-        descripcion TEXT,
-        permisos JSONB,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
+    // // Crear tabla de roles
+    // await client.query(`
+    //   CREATE TABLE IF NOT EXISTS roles (
+    //     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    //     nombre VARCHAR(50) UNIQUE NOT NULL,
+    //     descripcion TEXT,
+    //     permisos JSONB,
+    //     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    //   )
+    // `);
 
-    // Crear tabla de refresh tokens
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS refresh_tokens (
-        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-        user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-        token_hash VARCHAR(255) NOT NULL,
-        expires_at TIMESTAMP NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
+    // // Crear tabla de refresh tokens
+    // await client.query(`
+    //   CREATE TABLE IF NOT EXISTS refresh_tokens (
+    //     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    //     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    //     token_hash VARCHAR(255) NOT NULL,
+    //     expires_at TIMESTAMP NOT NULL,
+    //     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    //   )
+    // `);
 
-    // Crear tabla de sesiones de usuario
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS user_sessions (
-        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-        user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-        session_token VARCHAR(255) UNIQUE NOT NULL,
-        ip_address INET,
-        user_agent TEXT,
-        expires_at TIMESTAMP NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
+    // // Crear tabla de sesiones de usuario
+    // await client.query(`
+    //   CREATE TABLE IF NOT EXISTS user_sessions (
+    //     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    //     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    //     session_token VARCHAR(255) UNIQUE NOT NULL,
+    //     ip_address INET,
+    //     user_agent TEXT,
+    //     expires_at TIMESTAMP NOT NULL,
+    //     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    //   )
+    // `);
 
-    // Crear índices importantes
-    await client.query('CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)');
-    await client.query('CREATE INDEX IF NOT EXISTS idx_users_status ON users(status)');
-    await client.query('CREATE INDEX IF NOT EXISTS idx_users_rol ON users(rol)');
-    await client.query('CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user_id ON refresh_tokens(user_id)');
-    await client.query('CREATE INDEX IF NOT EXISTS idx_refresh_tokens_expires_at ON refresh_tokens(expires_at)');
-    await client.query('CREATE INDEX IF NOT EXISTS idx_user_sessions_user_id ON user_sessions(user_id)');
-    await client.query('CREATE INDEX IF NOT EXISTS idx_user_sessions_expires_at ON user_sessions(expires_at)');
+    // // Crear índices importantes
+    // await client.query('CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)');
+    // await client.query('CREATE INDEX IF NOT EXISTS idx_users_status ON users(status)');
+    // await client.query('CREATE INDEX IF NOT EXISTS idx_users_rol ON users(rol)');
+    // await client.query('CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user_id ON refresh_tokens(user_id)');
+    // await client.query('CREATE INDEX IF NOT EXISTS idx_refresh_tokens_expires_at ON refresh_tokens(expires_at)');
+    // await client.query('CREATE INDEX IF NOT EXISTS idx_user_sessions_user_id ON user_sessions(user_id)');
+    // await client.query('CREATE INDEX IF NOT EXISTS idx_user_sessions_expires_at ON user_sessions(expires_at)');
 
-    // Crear trigger para updated_at automático
-    await client.query(`
-      CREATE OR REPLACE FUNCTION update_updated_at_column()
-      RETURNS TRIGGER AS $$
-      BEGIN
-        NEW.updated_at = CURRENT_TIMESTAMP;
-        RETURN NEW;
-      END;
-      $$ LANGUAGE plpgsql;
-    `);
+    // // Crear trigger para updated_at automático
+    // await client.query(`
+    //   CREATE OR REPLACE FUNCTION update_updated_at_column()
+    //   RETURNS TRIGGER AS $$
+    //   BEGIN
+    //     NEW.updated_at = CURRENT_TIMESTAMP;
+    //     RETURN NEW;
+    //   END;
+    //   $$ LANGUAGE plpgsql;
+    // `);
 
-    await client.query(`
-      DROP TRIGGER IF EXISTS update_users_updated_at ON users;
-      CREATE TRIGGER update_users_updated_at
-        BEFORE UPDATE ON users
-        FOR EACH ROW
-        EXECUTE FUNCTION update_updated_at_column();
-    `);
+    // await client.query(`
+    //   DROP TRIGGER IF EXISTS update_users_updated_at ON users;
+    //   CREATE TRIGGER update_users_updated_at
+    //     BEFORE UPDATE ON users
+    //     FOR EACH ROW
+    //     EXECUTE FUNCTION update_updated_at_column();
+    // `);
 
     client.release();
     
     // Inicializar roles por defecto
-    const Role = require('../models/Role');
-    await Role.initializeDefaultRoles();
+    //const Role = require('../models/Role');
+    //await Role.initializeDefaultRoles();
     
     logger.info('Esquema de base de datos inicializado correctamente');
   } catch (error) {
