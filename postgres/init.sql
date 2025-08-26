@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS providers (
     phone_number VARCHAR(20),
     whatsapp_number VARCHAR(20),
     email VARCHAR(150),
+    user_id VARCHAR(100),
     address VARCHAR(255),
     delivery_day DATE,
     is_active BOOLEAN DEFAULT TRUE
@@ -90,5 +91,5 @@ CREATE TABLE IF NOT EXISTS inventory_pd (
     supplier_name VARCHAR(100),
     presentation VARCHAR(50),
     expiration_date DATE,
-    profit_margin DECIMAL(5, 2)
+    profit_margin DECIMAL(10, 2)
 );

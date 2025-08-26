@@ -8,7 +8,8 @@ class ProviderController {
    */
   async list(req, res) {
     try {
-      const providers = await providerService.findAll();
+      const userId = req.user.id;
+      const providers = await providerService.findByUserId(userId);
       res.status(200).json(providers);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -22,7 +23,8 @@ class ProviderController {
   async retrieve(req, res) {
     try {
       const { id } = req.params;
-      const provider = await providerService.findById(id);
+      const userId = req.user.id;
+      const provider = await providerService.findByIdAndUserId(id, userId);
 
       if (!provider) {
         return res.status(404).json({ message: "Provider not found" });
@@ -40,12 +42,14 @@ class ProviderController {
    */
   async create(req, res) {
     try {
+      const userId = req.user.id;
       const validationError = validateProviderInput(req.body);
+
       if (validationError) {
         return res.status(400).json({ error: validationError });
       }
 
-      const provider = await providerService.create(req.body);
+      const provider = await providerService.create(req.body, userId);
       res.status(201).json(provider);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -59,7 +63,11 @@ class ProviderController {
   async delete(req, res) {
     try {
       const { id } = req.params;
-      const deletedProvider = await providerService.deleteById(id);
+      const userId = req.user.id;
+      const deletedProvider = await providerService.deleteByIdAndUserId(
+        id,
+        userId
+      );
 
       if (!deletedProvider) {
         return res.status(404).json({ message: "Provider not found" });
