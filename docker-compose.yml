@@ -1,249 +1,44 @@
-# ==============================================
-# DOCKER COMPOSE - MICROSERVICIO DE USUARIOS
-# ==============================================
-# Orquestación de servicios:
-# - Servicio principal de usuarios
-# - Base de datos PostgreSQL con persistencia
-# - Cache Redis para sesiones
-# - Red interna para comunicación segura
-# - Volúmenes para desarrollo local
-
-version: '3.8'
+version: "3.8"
 
 services:
-  # ==============================================
-  # MICROSERVICIO DE USUARIOS
-  # ==============================================
-  usuarios-service:
-    build: 
+
+  main:
+    image: app
+    build:
       context: .
-      dockerfile: Dockerfile
-      target: production
-    container_name: usuarios-service
+    volumes:
+      - .:/app/
+      - /app/node_modules/
+    command: npm run dev
     ports:
-      - "${PORT:-3002}:3002"
+      - "${PORT_SERVER:-}:${PORT_SERVER:-}"
+    expose:
+      - ${PORT_SERVER:-}
     environment:
-      # Aplicación
-      NODE_ENV: ${NODE_ENV:-development}
-      PORT: 3002
-      APP_NAME: ${APP_NAME:-Gestión Comercial}
-      LOG_LEVEL: ${LOG_LEVEL:-info}
-      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
-      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000}
-      
-      # Base de datos
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: ${DB_NAME:-usuarios_service}
-      DB_USER: ${DB_USER:-postgres}
-      DB_PASSWORD: ${DB_PASSWORD:-password}
-      
-      # JWT
-      JWT_SECRET: ${JWT_SECRET:-desarrollo_jwt_secret_muy_largo_y_seguro_aqui}
-      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-desarrollo_refresh_secret_muy_largo_aqui}
-      JWT_ACCESS_EXPIRY: ${JWT_ACCESS_EXPIRY:-15m}
-      JWT_REFRESH_EXPIRY: ${JWT_REFRESH_EXPIRY:-7d}
-      
-      # Email
-      EMAIL_PROVIDER: ${EMAIL_PROVIDER:-smtp}
-      EMAIL_HOST: ${EMAIL_HOST:-smtp.gmail.com}
-      EMAIL_PORT: ${EMAIL_PORT:-587}
-      EMAIL_SECURE: ${EMAIL_SECURE:-false}
-      EMAIL_USER: ${EMAIL_USER:-}
-      EMAIL_PASS: ${EMAIL_PASS:-}
-      EMAIL_FROM: ${EMAIL_FROM:-noreply@gestioncomercial.com}
-      
-      # Redis
-      REDIS_URL: redis://redis:6379
-      
-      # Rate limiting
-      SKIP_RATE_LIMIT: ${SKIP_RATE_LIMIT:-false}
-    
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    
-    volumes:
-      # Para desarrollo: montar código fuente
-      - ./src:/app/src:ro
-      - ./logs:/app/logs
-    
-    networks:
-      - usuarios-network
-    
-    restart: unless-stopped
-    
-    # Recursos
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-          cpus: '0.5'
-        reservations:
-          memory: 256M
-          cpus: '0.25'
-
-  # ==============================================
-  # BASE DE DATOS POSTGRESQL
-  # ==============================================
-  postgres:
-    image: postgres:15-alpine
-    container_name: usuarios-postgres
-    environment:
-      POSTGRES_DB: ${DB_NAME:-usuarios_service}
-      POSTGRES_USER: ${DB_USER:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
-      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
-    
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./sql/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
-      - ./sql/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
-    
-    ports:
-      - "${DB_EXTERNAL_PORT:-5432}:5432"
-    
-    networks:
-      - usuarios-network
-    
-    restart: unless-stopped
-    
-    # Health check
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-usuarios_service}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-    
-    # Recursos
-    deploy:
-      resources:
-        limits:
-          memory: 1G
-          cpus: '1.0'
-        reservations:
-          memory: 512M
-          cpus: '0.5'
-
-  # ==============================================
-  # REDIS PARA CACHE Y SESIONES
-  # ==============================================
-  redis:
-    image: redis:7-alpine
-    container_name: usuarios-redis
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-}
-    
-    volumes:
-      - redis_data:/data
-    
-    ports:
-      - "${REDIS_EXTERNAL_PORT:-6379}:6379"
-    
-    networks:
-      - usuarios-network
-    
-    restart: unless-stopped
-    
-    # Health check
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-    
-    # Recursos
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-          cpus: '0.25'
-        reservations:
-          memory: 128M
-          cpus: '0.1'
-
-  # ==============================================
-  # PGADMIN (OPCIONAL - SOLO DESARROLLO)
-  # ==============================================
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: usuarios-pgadmin
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@localhost.com}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin123}
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
-    
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
-    
-    ports:
-      - "${PGADMIN_PORT:-8080}:80"
-    
+      # Database config
+      - DB_HOST=${DB_HOST:-}
+      - DB_USER=${DB_USER:-}
+      - DB_PASSWORD=${DB_PASSWORD:-}
+      - DB_NAME=${DB_NAME:-}
+      - DB_PORT=${DB_PORT:-}
+      - DB_POOL_MAX=${DB_POOL_MAX:-}
+      - DB_POOL_MIN=${DB_POOL_MIN:-}
+      - DB_IDLE_TIMEOUT=${DB_IDLE_TIMEOUT:-}
+      - DB_CONNECTION_TIMEOUT=${DB_CONNECTION_TIMEOUT:-}
+      - DB_STATEMENT_TIMEOUT=${DB_STATEMENT_TIMEOUT:-}
+      - DB_QUERY_TIMEOUT=${DB_QUERY_TIMEOUT:-}
     depends_on:
       - postgres
-    
-    networks:
-      - usuarios-network
-    
-    restart: unless-stopped
-    
-    profiles:
-      - development  # Solo se inicia con --profile development
 
-  # ==============================================
-  # REDIS COMMANDER (OPCIONAL - SOLO DESARROLLO)
-  # ==============================================
-  redis-commander:
-    image: rediscommander/redis-commander:latest
-    container_name: usuarios-redis-commander
+  postgres:
+    image: postgres:15
+    restart: unless-stopped
     environment:
-      REDIS_HOSTS: local:redis:6379
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
-    
+      - POSTGRES_USER=${DB_USER:-}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-}
+      - POSTGRES_DB=${DB_NAME:-}
     ports:
-      - "${REDIS_COMMANDER_PORT:-8081}:8081"
-    
-    depends_on:
-      - redis
-    
-    networks:
-      - usuarios-network
-    
-    restart: unless-stopped
-    
-    profiles:
-      - development  # Solo se inicia con --profile development
-
-# ==============================================
-# VOLÚMENES PERSISTENTES
-# ==============================================
-volumes:
-  postgres_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${PWD}/data/postgres
-  
-  redis_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${PWD}/data/redis
-  
-  pgadmin_data:
-    driver: local
-
-# ==============================================
-# RED INTERNA
-# ==============================================
-networks:
-  usuarios-network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16
+      - ${DB_PORT:-}:${DB_PORT:-}
+    volumes:
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: -p ${DB_PORT:-}

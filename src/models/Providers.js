@@ -11,6 +11,23 @@ class Providers {
     this.address = providerData.address;
     this.deliveryDay = providerData.delivery_day;
     this.isActive = providerData.is_active;
+    this.userId = providerData.user_id;
+    this.objectId = providerData.object_id;
+  }
+
+  static findByUserId(userId) {
+    const query = "SELECT * FROM providers WHERE user_id = $1";
+    return db
+      .query(query, [userId])
+      .then((result) => {
+        if (result.rows.length === 0) {
+          return [];
+        }
+        return result.rows.map((row) => new Providers(row));
+      })
+      .catch((error) => {
+        throw error;
+      });
   }
 
   static findAll() {
@@ -22,6 +39,22 @@ class Providers {
           return [];
         }
         return result.rows.map((row) => new Providers(row));
+      })
+      .catch((error) => {
+        throw error;
+      });
+  }
+
+  static findByIdAndUserId(id, userId) {
+    const query =
+      "SELECT * FROM providers WHERE id = $1 AND user_id = $2 LIMIT 1";
+    return db
+      .query(query, [id, userId])
+      .then((result) => {
+        if (result.rows.length === 0) {
+          return null;
+        }
+        return new Providers(result.rows[0]);
       })
       .catch((error) => {
         throw error;
@@ -43,13 +76,14 @@ class Providers {
       });
   }
 
-  static create(data) {
+  static create(data, userId) {
     const query = `
     INSERT INTO providers 
-      (title, owner_name, phone_number, whatsapp_number, email, address, delivery_day, is_active)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      (title, owner_name, phone_number, whatsapp_number, email, address, delivery_day, is_active, object_id, user_id)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
     RETURNING *;
   `;
+
     const values = [
       data.title,
       data.ownerName,
@@ -59,11 +93,29 @@ class Providers {
       data.address,
       data.deliveryDay,
       data.isActive ?? true,
+      data.objectId ?? null,
+      userId,
     ];
 
     return db
       .query(query, values)
       .then((result) => new Providers(result.rows[0]))
+      .catch((error) => {
+        throw error;
+      });
+  }
+
+  static deleteByIdAndUserId(id, userId) {
+    const query =
+      "DELETE FROM providers WHERE id = $1 AND user_id = $2 RETURNING *";
+    return db
+      .query(query, [id, userId])
+      .then((result) => {
+        if (result.rows.length === 0) {
+          return null;
+        }
+        return new Providers(result.rows[0]);
+      })
       .catch((error) => {
         throw error;
       });
@@ -94,6 +146,7 @@ class Providers {
       address,
       deliveryDay,
       isActive,
+      objectId,
     } = data;
 
     const query = `
@@ -106,8 +159,9 @@ class Providers {
       email = COALESCE($5, email),
       address = COALESCE($6, address),
       delivery_day = COALESCE($7, delivery_day),
-      is_active = COALESCE($8, is_active)
-    WHERE id = $9
+      is_active = COALESCE($8, is_active),
+      object_id = $9
+    WHERE id = $10
     RETURNING *;
   `;
 
@@ -120,6 +174,7 @@ class Providers {
       address ?? null,
       deliveryDay ?? null,
       isActive ?? null,
+      objectId === undefined ? undefined : objectId,
       id,
     ];
 
