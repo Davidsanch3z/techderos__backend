@@ -1,32 +1,23 @@
-/**
- * Archivo principal de la aplicación
- * Responsabilidades:
- * - Configuración de Express y middlewares globales
- * - Registro de rutas principales
- * - Configuración de manejo de errores
- * - Inicio del servidor HTTP
- */
-
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
+
 require("dotenv").config();
 
 const logger = require("./utils/logger");
 const { connectDatabase } = require("./config/database");
 
-// Importar rutas
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/users");
 const inventoryRoutes = require("./routes/inventory");
 const salesRoutes = require("./routes/sales");
 const providersRoutes = require("./routes/providers");
+const objectsRoutes = require("./routes/objects");
+const qrRoutes = require("./routes/qrRoutes");
 
-// Crear aplicación Express
 const app = express();
 
-// Middlewares de seguridad
 app.use(helmet());
 app.use(
   cors({
@@ -37,27 +28,13 @@ app.use(
   })
 );
 
-// Middlewares de parsing
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
-
-// Logging
 app.use(
   morgan("combined", {
     stream: { write: (message) => logger.info(message.trim()) },
   })
 );
-
-// Health check endpoint
-app.get("/health", (req, res) => {
-  res.json({
-    status: "healthy",
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    version: process.env.npm_package_version || "1.0.0",
-    environment: process.env.NODE_ENV || "development",
-  });
-});
 
 // Registrar rutas
 app.use("/api/auth", authRoutes);
@@ -65,8 +42,9 @@ app.use("/api/users", userRoutes);
 app.use("/api/inventory", inventoryRoutes);
 app.use("/api/sales", salesRoutes);
 app.use("/api/providers", providersRoutes);
+app.use("/api/objects", objectsRoutes);
+app.use("/api/qr", qrRoutes);
 
-// Ruta de documentación API
 app.get("/api/docs", (req, res) => {
   res.json({
     message: "API Documentation",
@@ -80,7 +58,6 @@ app.get("/api/docs", (req, res) => {
   });
 });
 
-// Middleware de manejo de errores 404
 app.use("*", (req, res) => {
   res.status(404).json({
     success: false,
@@ -89,7 +66,6 @@ app.use("*", (req, res) => {
   });
 });
 
-// Middleware global de manejo de errores
 app.use((error, req, res, next) => {
   logger.error("Error no controlado:", {
     error: error.message,
@@ -106,14 +82,10 @@ app.use((error, req, res, next) => {
   });
 });
 
-// Función para iniciar el servidor
 async function startServer() {
   try {
-    // Conectar a la base de datos
     await connectDatabase();
     logger.info("Conexión a base de datos establecida");
-
-    // Iniciar servidor
     const PORT = process.env.PORT || 3002;
     app.listen(PORT, () => {
       logger.info(`🚀 Servidor de usuarios iniciado en puerto ${PORT}`);
@@ -128,7 +100,6 @@ async function startServer() {
   }
 }
 
-// Manejo de cierre graceful
 process.on("SIGTERM", () => {
   logger.info("Recibida señal SIGTERM, cerrando servidor...");
   process.exit(0);
@@ -139,7 +110,6 @@ process.on("SIGINT", () => {
   process.exit(0);
 });
 
-// Iniciar servidor si este archivo es ejecutado directamente
 if (require.main === module) {
   startServer();
 }

@@ -1,5 +1,6 @@
 const { validateProviderInput } = require("../utils/providers");
 const providerService = require("../services/providerService");
+const objectsService = require("../services/objectsService");
 
 class ProviderController {
   /**
@@ -30,7 +31,8 @@ class ProviderController {
         return res.status(404).json({ message: "Provider not found" });
       }
 
-      res.status(200).json(provider);
+      const object = await objectsService.getObject(userId, provider.objectId);
+      res.status(200).json({ ...provider, object });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

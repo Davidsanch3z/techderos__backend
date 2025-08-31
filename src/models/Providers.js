@@ -12,6 +12,7 @@ class Providers {
     this.deliveryDay = providerData.delivery_day;
     this.isActive = providerData.is_active;
     this.userId = providerData.user_id;
+    this.objectId = providerData.object_id;
   }
 
   static findByUserId(userId) {
@@ -78,8 +79,8 @@ class Providers {
   static create(data, userId) {
     const query = `
     INSERT INTO providers 
-      (title, owner_name, phone_number, whatsapp_number, email, address, delivery_day, is_active, user_id)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      (title, owner_name, phone_number, whatsapp_number, email, address, delivery_day, is_active, object_id, user_id)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
     RETURNING *;
   `;
 
@@ -92,6 +93,7 @@ class Providers {
       data.address,
       data.deliveryDay,
       data.isActive ?? true,
+      data.objectId ?? null,
       userId,
     ];
 
@@ -144,6 +146,7 @@ class Providers {
       address,
       deliveryDay,
       isActive,
+      objectId,
     } = data;
 
     const query = `
@@ -156,8 +159,9 @@ class Providers {
       email = COALESCE($5, email),
       address = COALESCE($6, address),
       delivery_day = COALESCE($7, delivery_day),
-      is_active = COALESCE($8, is_active)
-    WHERE id = $9
+      is_active = COALESCE($8, is_active),
+      object_id = $9
+    WHERE id = $10
     RETURNING *;
   `;
 
@@ -170,6 +174,7 @@ class Providers {
       address ?? null,
       deliveryDay ?? null,
       isActive ?? null,
+      objectId === undefined ? undefined : objectId,
       id,
     ];
 

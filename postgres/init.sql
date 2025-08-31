@@ -66,6 +66,7 @@ CREATE TABLE IF NOT EXISTS providers (
     user_id VARCHAR(100),
     address VARCHAR(255),
     delivery_day DATE,
+    object_id VARCHAR(255),
     is_active BOOLEAN DEFAULT TRUE
 );
 
@@ -92,4 +93,17 @@ CREATE TABLE IF NOT EXISTS inventory_pd (
     presentation VARCHAR(50),
     expiration_date DATE,
     profit_margin DECIMAL(10, 2)
+);
+
+CREATE TABLE IF NOT EXISTS objects (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    user_id VARCHAR(100)
+);
+
+CREATE TABLE IF NOT EXISTS objects (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    object_id VARCHAR(100),
+    user_id VARCHAR(100)
 );
