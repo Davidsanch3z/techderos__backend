@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS objects (
     user_id VARCHAR(100)
 );
 
-CREATE TABLE IF NOT EXISTS objects (
+CREATE TABLE IF NOT EXISTS qrs (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100),
     object_id VARCHAR(100),
