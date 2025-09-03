@@ -25,18 +25,17 @@ class Sale {
     } = data;
 
     const query = `
-  UPDATE "sales_pd"
-  SET
-    date = COALESCE($1, date),
-    customer = COALESCE($2, customer),
-    customer_email = COALESCE($3, customer_email),
-    products = COALESCE($4, products),
-    payment_method = COALESCE($5, payment_method),
-    total = COALESCE($6, total),
-    amount = COALESCE($7, amount)
-  WHERE id = $8 AND user_id = $9
-  RETURNING *;
-`;
+      UPDATE sales_pd
+      SET
+          date = COALESCE(?, date),
+          customer = COALESCE(?, customer),
+          customer_email = COALESCE(?, customer_email),
+          products = COALESCE(?, products),
+          payment_method = COALESCE(?, payment_method),
+          total = COALESCE(?, total),
+          amount = COALESCE(?, amount)
+      WHERE id = ? AND user_id = ?;
+    `;
 
     const values = [
       date ?? null,
@@ -51,11 +50,14 @@ class Sale {
     ];
 
     try {
-      const result = await db.query(query, values);
-      if (result.rows.length === 0) {
+      await db.query(query, values);
+      const check = "SELECT * FROM sales_pd WHERE id = $1";
+      const check_result = await db.query(check, [id]);
+      if (check_result.rows.length === 0) {
         return null;
       }
-      return new Sale(result.rows[0]);
+
+      return new Sale(check_result.rows[0]);
     } catch (error) {
       console.error("Error updating sales record:", error);
       throw error;
@@ -64,10 +66,9 @@ class Sale {
 
   static async deleteByUserIdAndItemId(userId, itemId) {
     const query = `
-    DELETE FROM "sales_pd"
-    WHERE id = $1 AND user_id = $2
-    RETURNING *;
-  `;
+      DELETE FROM sales_pd
+      WHERE id = $1 AND user_id = $2;
+    `;
     const values = [itemId, userId];
     const result = await db.query(query, values);
     return result.rowCount > 0;
@@ -75,7 +76,7 @@ class Sale {
 
   static findByUserIdAndItemId(userId, itemId) {
     const query =
-      'SELECT * FROM "sales_pd" WHERE user_id = $1 AND id = $2 LIMIT 1';
+      "SELECT * FROM sales_pd WHERE user_id = $1 AND id = $2 LIMIT 1";
     return db
       .query(query, [userId, itemId])
       .then((result) => {
@@ -90,7 +91,7 @@ class Sale {
   }
 
   static findByUserId(userId) {
-    const query = 'SELECT * FROM "sales_pd" WHERE user_id = $1';
+    const query = "SELECT * FROM sales_pd WHERE user_id = $1";
     return db
       .query(query, [userId])
       .then((result) => result.rows.map((row) => new Sale(row)))
@@ -110,19 +111,11 @@ class Sale {
     userId,
   }) {
     const query = `
-    INSERT INTO "sales_pd" (
-      date,
-      customer,
-      customer_email,
-      products,
-      payment_method,
-      total,
-      amount,
-      user_id
-    )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-    RETURNING *;
-  `;
+      INSERT INTO sales_pd (
+        date, customer, customer_email, products,
+        payment_method, total, amount, user_id
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
 
     const values = [
       date,
@@ -137,7 +130,19 @@ class Sale {
 
     return db
       .query(query, values)
-      .then((result) => new Sale(result.rows[0]))
+      .then(
+        (result) =>
+          new Sale({
+            date,
+            customer,
+            products,
+            total,
+            amount,
+            userId,
+            customer_email: customerEmail,
+            payment_method: paymentMethod,
+          })
+      )
       .catch((error) => {
         console.error("Error inserting sales record:", error);
         throw error;

@@ -81,10 +81,17 @@ class QrController {
     try {
       const { id } = req.params;
       const userId = req.user.id;
+
+      const check = await qrService.findByIdAndUserId(id, userId);
+      if (!check) {
+        res.status(404).json({ error: "Not found" });
+        return;
+      }
+
       const deletedQr = await qrService.deleteByIdAndUserId(id, userId);
 
       if (!deletedQr) {
-        return res.status(404).json({ message: "Provider not found" });
+        return res.status(404).json({ message: "You dont have permissions" });
       }
 
       res.status(200).json({ message: "Deleted successfully", deletedQr });

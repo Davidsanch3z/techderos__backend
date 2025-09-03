@@ -22,6 +22,4 @@ class SaleService {
   }
 }
 
-
-
 module.exports = new SaleService();

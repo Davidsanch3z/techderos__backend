@@ -110,7 +110,7 @@ class User {
       if (existingUser) {
         // Actualizar usuario existente
         const query = `
-          UPDATE "users" 
+          UPDATE users 
           SET email = $1, password = $2, name = $3, "roleId" = $4, 
               "isActive" = $5, "updatedAt" = $6, "empresaId" = $7
           WHERE id = $8
@@ -136,9 +136,8 @@ class User {
       } else {
         // Crear nuevo usuario
         const query = `
-          INSERT INTO "users" (id, email, password, name, "roleId", "isActive", "createdAt", "updatedAt", "empresaId")
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-          RETURNING *
+        INSERT INTO users (id, email, password, name, roleId, createdAt, updatedAt, empresaId)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?);
         `;
         const values = [
           this.id,
@@ -146,16 +145,18 @@ class User {
           this.password,
           this.name,
           this.roleId,
-          this.isActive,
           this.createdAt,
           this.updatedAt,
           this.empresaId,
         ];
 
         const result = await db.query(query, values);
-
-        if (result.rows.length > 0) {
-          Object.assign(this, result.rows[0]);
+        const check_user = await db.query(
+          "SELECT * FROM users WHERE email = $1",
+          [this.email]
+        );
+        if (check_user.rows.length > 0) {
+          Object.assign(this, check_user.rows[0]);
           return this;
         }
       }
@@ -191,7 +192,7 @@ class User {
    */
   static async findById(id) {
     try {
-      const query = 'SELECT * FROM "users" WHERE id = $1;';
+      const query = "SELECT * FROM users WHERE id = $1;";
       const result = await db.query(query, [id]);
 
       if (result.rows.length === 0) {
@@ -212,7 +213,7 @@ class User {
     try {
       const { page = 1, limit = 10, rol, status, search } = filters;
 
-      let query = 'SELECT * FROM "users";';
+      let query = "SELECT * FROM users;";
       const params = [];
       let paramCount = 0;
 

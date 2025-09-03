@@ -7,9 +7,13 @@ class salesController {
    * GET /api/sales/list
    */
   async list(req, res) {
-    const userId = req.user.id;
-    const sales = await saleService.getSalesFromUser(userId);
-    res.status(200).json(sales);
+    try {
+      const userId = req.user.id;
+      const sales = await saleService.getSalesFromUser(userId);
+      res.status(200).json(sales);
+    } catch (error) {
+      res.status(500).json({ error });
+    }
   }
 
   /**
@@ -69,8 +73,8 @@ class salesController {
         amount,
       });
       res.status(201).json(sale);
-    } catch (err) {
-      res.status(500).json({ error: "Internal server error" });
+    } catch (error) {
+      res.status(500).json({ error });
     }
   }
 
@@ -81,13 +85,17 @@ class salesController {
   async partialUpdate(req, res) {
     const userId = req.user.id;
     const itemId = req.params.id;
-
     try {
+      const check = await saleService.findByUserIdAndItemId(userId, itemId);
+      if (!check) {
+        res.status(404).json({ error: "Not found" });
+        return;
+      }
+
       const result = await saleService.partialUpdate(itemId, userId, req.body);
       res.status(200).json(result);
-    } catch (err) {
-      console.log(err);
-      res.status(404).json({ error: "Not found" });
+    } catch (error) {
+      res.status(500).json({ error });
     }
   }
 
@@ -99,13 +107,13 @@ class salesController {
     const userId = req.user.id;
     const itemId = req.params.id;
     try {
-      const deleted = await saleService.deleteInventory(userId, itemId);
-      if (!deleted) {
-        return res
-          .status(404)
-          .json({ error: "Item not found or unauthorized" });
+      const check = await saleService.findByUserIdAndItemId(userId, itemId);
+      if (!check) {
+        res.status(404).json({ error: "Not found" });
+        return;
       }
 
+      await saleService.deleteInventory(userId, itemId);
       res.status(200).json({ message: "Item deleted successfully" });
     } catch (err) {
       console.error(err);

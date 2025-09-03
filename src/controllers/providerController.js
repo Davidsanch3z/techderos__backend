@@ -66,13 +66,20 @@ class ProviderController {
     try {
       const { id } = req.params;
       const userId = req.user.id;
+
+      const check = await providerService.findByIdAndUserId(id, userId);
+      if (!check) {
+        res.status(404).json({ error: "Not found" });
+        return;
+      }
+
       const deletedProvider = await providerService.deleteByIdAndUserId(
         id,
         userId
       );
 
       if (!deletedProvider) {
-        return res.status(404).json({ message: "Provider not found" });
+        return res.status(404).json({ message: "You dont have permissions" });
       }
 
       res

@@ -4,20 +4,26 @@ class Object {
   constructor(data = {}) {
     this.id = data.id;
     this.name = data.name;
-    this.url = `${process.env.DOMAIN_URL}/${data.name}`
+    this.url = `${process.env.DOMAIN_URL}/${data.name}`;
   }
 
   static create(data, userId) {
     const query = `
       INSERT INTO objects (name, user_id)
-      VALUES ($1, $2)
-      RETURNING *;
+      VALUES ($1, $2);
     `;
 
     const values = [data.name, userId];
     return db
       .query(query, values)
-      .then((result) => new Object(result.rows[0]))
+      .then(async (_) => {
+        const check = "SELECT * FROM objects WHERE name = $1";
+        const check_result = await db.query(check, [data.name]);
+        if (check_result.rows.length === 0) {
+          return null;
+        }
+        return new Object(check_result.rows[0]);
+      })
       .catch((error) => {
         throw error;
       });

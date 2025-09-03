@@ -3,7 +3,7 @@ function validateQrInput({ name, objectId }) {
     return '"name" is required and must be a string';
   }
 
-  if (objectId === undefined || typeof objectId !== "number") {
+  if ((!objectId && objectId === undefined) || typeof objectId !== "number") {
     return '"objectId" is required and must be a number';
   }
 
