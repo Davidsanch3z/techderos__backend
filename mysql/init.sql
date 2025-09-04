@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS providers (
     email VARCHAR(150),
     user_id VARCHAR(100),
     address VARCHAR(255),
-    delivery_day DATE,
+    delivery_day VARCHAR(250),
     object_id VARCHAR(255),
     is_active BOOLEAN DEFAULT TRUE
 );
@@ -75,7 +75,9 @@ CREATE TABLE IF NOT EXISTS sales_pd (
     payment_method VARCHAR(100),
     total DECIMAL(10, 2) NOT NULL,
     user_id VARCHAR(255),
-    amount INT DEFAULT 0
+    amount INT DEFAULT 0,
+    dni VARCHAR(50),
+    address VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS inventory_pd (
@@ -87,7 +89,7 @@ CREATE TABLE IF NOT EXISTS inventory_pd (
     user_id VARCHAR(100),
     supplier_name VARCHAR(100),
     presentation VARCHAR(50),
-    expiration_date DATE,
+    expiration_date VARCHAR(250),
     profit_margin DECIMAL(10, 2)
 );
 

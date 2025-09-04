@@ -52,6 +52,8 @@ class salesController {
       paymentMethod,
       total,
       amount,
+      address,
+      dni,
     } = req.body;
 
     const userId = req.user.id;
@@ -71,6 +73,8 @@ class salesController {
         total,
         userId,
         amount,
+        address,
+        dni,
       });
       res.status(201).json(sale);
     } catch (error) {

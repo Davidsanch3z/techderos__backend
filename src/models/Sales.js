@@ -11,6 +11,8 @@ class Sale {
     this.total = data.total;
     this.userId = data.user_id;
     this.amount = data.amount;
+    this.address = data.address;
+    this.dni = data.dni;
   }
 
   static async updateById(id, userId, data = {}) {
@@ -22,6 +24,8 @@ class Sale {
       paymentMethod,
       total,
       amount,
+      address,
+      dni,
     } = data;
 
     const query = `
@@ -33,7 +37,9 @@ class Sale {
           products = COALESCE(?, products),
           payment_method = COALESCE(?, payment_method),
           total = COALESCE(?, total),
-          amount = COALESCE(?, amount)
+          amount = COALESCE(?, amount),
+          address = COALESCE(?, address),
+          dni = COALESCE(?, dni)
       WHERE id = ? AND user_id = ?;
     `;
 
@@ -45,6 +51,8 @@ class Sale {
       paymentMethod ?? null,
       total ?? null,
       amount ?? null,
+      address ?? null,
+      dni ?? null,
       id,
       userId,
     ];
@@ -109,12 +117,15 @@ class Sale {
     total,
     amount,
     userId,
+    address,
+    dni,
   }) {
     const query = `
       INSERT INTO sales_pd (
         date, customer, customer_email, products,
-        payment_method, total, amount, user_id
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        payment_method, total, amount, user_id,
+        address, dni
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
@@ -126,6 +137,8 @@ class Sale {
       total,
       amount,
       userId,
+      address,
+      dni,
     ];
 
     return db
@@ -139,6 +152,8 @@ class Sale {
             total,
             amount,
             userId,
+            address,
+            dni,
             customer_email: customerEmail,
             payment_method: paymentMethod,
           })

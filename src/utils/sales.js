@@ -6,6 +6,8 @@ function validateSalesInput({
   paymentMethod,
   total,
   amount,
+  dni,
+  address,
 }) {
   if (!date || isNaN(Date.parse(date))) {
     return '"date" is required and must be a valid date';
@@ -13,6 +15,15 @@ function validateSalesInput({
   if (!customer || typeof customer !== "string") {
     return '"customer" is required and must be a string';
   }
+
+  if (!dni || typeof dni !== "string") {
+    return '"dni" is required and must be a string';
+  }
+
+  if (!address || typeof address !== "string") {
+    return '"address" is required and must be a string';
+  }
+
   if (!customerEmail && typeof customerEmail !== "string") {
     return '"customerEmail" must be a string';
   }
@@ -22,10 +33,10 @@ function validateSalesInput({
   if (!paymentMethod || typeof paymentMethod !== "string") {
     return '"paymentMethod" is required and must be a string';
   }
-  if (!total&& total === undefined || isNaN(total)) {
+  if ((!total && total === undefined) || isNaN(total)) {
     return '"total" is required and must be a number';
   }
-  if (!amount && amount === undefined || isNaN(amount)) {
+  if ((!amount && amount === undefined) || isNaN(amount)) {
     return '"amount" is required and must be a number';
   }
   return null;
