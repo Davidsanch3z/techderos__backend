@@ -163,7 +163,7 @@ DB_PASSWORD=tu_password_seguro
 # JWT
 JWT_SECRET=tu_jwt_secret_muy_largo_y_seguro
 JWT_REFRESH_SECRET=tu_refresh_secret_muy_largo
-JWT_ACCESS_EXPIRY=15m
+JWT_ACCESS_EXPIRY=7d
 JWT_REFRESH_EXPIRY=7d
 
 # Email

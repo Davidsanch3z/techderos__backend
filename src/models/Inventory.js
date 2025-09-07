@@ -14,6 +14,21 @@ class Inventory {
     this.profitMargin = data.profit_margin;
   }
 
+  static findById(itemId) {
+    const query = "SELECT * FROM inventory_pd WHERE id = $1 LIMIT 1";
+    return db
+      .query(query, [itemId])
+      .then((result) => {
+        if (result.rows.length === 0) {
+          return null;
+        }
+        return new Inventory(result.rows[0]);
+      })
+      .catch((error) => {
+        throw error;
+      });
+  }
+
   static findByUserIdAndItemId(userId, itemId) {
     const query =
       "SELECT * FROM inventory_pd WHERE user_id = $1 AND id = $2 LIMIT 1";
@@ -73,20 +88,7 @@ class Inventory {
 
     return db
       .query(query, values)
-      .then(
-        () =>
-          new Inventory({
-            name,
-            price,
-            quantity,
-            category,
-            presentation,
-            user_id: userId,
-            supplier_name: supplierName,
-            expiration_date: expirationDate,
-            profit_margin: profitMargin,
-          })
-      )
+      .then((result) => Inventory.findById(result.rows.insertId))
       .catch((error) => {
         throw error;
       });
@@ -105,18 +107,18 @@ class Inventory {
     } = data;
 
     const query = `
-    UPDATE inventory_pd
-    SET
-      name = COALESCE(?, name),
-      price = COALESCE(?, price),
-      quantity = COALESCE(?, quantity),
-      category = COALESCE(?, category),
-      supplier_name = COALESCE(?, supplier_name),
-      presentation = COALESCE(?, presentation),
-      expiration_date = COALESCE(?, expiration_date),
-      profit_margin = COALESCE(?, profit_margin)
-    WHERE id = ?;
-  `;
+      UPDATE inventory_pd
+      SET
+        name = COALESCE(?, name),
+        price = COALESCE(?, price),
+        quantity = COALESCE(?, quantity),
+        category = COALESCE(?, category),
+        supplier_name = COALESCE(?, supplier_name),
+        presentation = COALESCE(?, presentation),
+        expiration_date = COALESCE(?, expiration_date),
+        profit_margin = COALESCE(?, profit_margin)
+      WHERE id = ?;
+    `;
 
     const values = [
       name ?? null,
@@ -131,14 +133,8 @@ class Inventory {
     ];
 
     try {
-      const result = await db.query(query, values);
-      if (result.rows.length === 0) {
-        return null;
-      }
-
-      const check = "SELECT * FROM inventory_pd WHERE id = $1";
-      const check_result = await db.query(check, [id]);
-      return new Inventory(check_result.rows[0]);
+      await db.query(query, values);
+      return Inventory.findById(id);
     } catch (error) {
       console.error("Error updating inventory item:", error);
       throw error;

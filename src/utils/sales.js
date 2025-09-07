@@ -16,17 +16,18 @@ function validateSalesInput({
     return '"customer" is required and must be a string';
   }
 
-  if (!dni || typeof dni !== "string") {
+  if (typeof dni !== "string") {
     return '"dni" is required and must be a string';
   }
 
-  if (!address || typeof address !== "string") {
+  if (typeof address !== "string") {
     return '"address" is required and must be a string';
   }
 
-  if (!customerEmail && typeof customerEmail !== "string") {
+  if (typeof customerEmail !== "string") {
     return '"customerEmail" must be a string';
   }
+  
   if (!products || typeof products !== "string") {
     return '"products" is required and must be a string';
   }

@@ -109,13 +109,14 @@ class User {
 
       if (existingUser) {
         // Actualizar usuario existente
+        console.log("UPDATEEEEEEEEEEE");
         const query = `
           UPDATE users 
-          SET email = $1, password = $2, name = $3, "roleId" = $4, 
-              "isActive" = $5, "updatedAt" = $6, "empresaId" = $7
-          WHERE id = $8
-          RETURNING *
+          SET email = ?, password = ?, name = ?, roleId = ?, 
+              isActive = ?, updatedAt = ?, empresaId = ?
+          WHERE id = ?
         `;
+
         const values = [
           this.email,
           this.password,
@@ -127,17 +128,17 @@ class User {
           this.id,
         ];
 
-        const result = await db.query(query, values);
+        await db.query(query, values);
+        const user = await User.findById(this.id);
 
-        if (result.rows.length > 0) {
-          Object.assign(this, result.rows[0]);
-          return this;
+        if (user) {
+          return Object.assign(this, user);
         }
       } else {
-        // Crear nuevo usuario
+        console.log("CREATINGGG");
         const query = `
-        INSERT INTO users (id, email, password, name, roleId, createdAt, updatedAt, empresaId)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+          INSERT INTO users (id, email, password, name, roleId, createdAt, updatedAt, empresaId)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?);
         `;
         const values = [
           this.id,
@@ -161,7 +162,7 @@ class User {
         }
       }
 
-      throw new Error("No se pudo guardar el usuario");
+      throw new Error("No se pudo guardar el usuarioXXXXX");
     } catch (error) {
       logger.error("Error guardando usuario:", error);
       throw error;
@@ -213,21 +214,19 @@ class User {
     try {
       const { page = 1, limit = 10, rol, status, search } = filters;
 
-      let query = "SELECT * FROM users;";
+      let query = "SELECT * FROM users WHERE 1=1";
       const params = [];
       let paramCount = 0;
 
       // Filtro por búsqueda (nombre o email)
       if (search) {
-        paramCount++;
-        query += ` AND (name ILIKE $${paramCount} OR email ILIKE $${paramCount})`;
-        params.push(`%${search}%`);
+        query += ` AND (name LIKE ? OR email LIKE ?)`;
+        params.push(`%${search}%`, `%${search}%`);
       }
 
       // Filtro por rol
       if (rol) {
-        paramCount++;
-        query += ` AND "roleId" = $${paramCount}`;
+        query += ` AND roleId = ?`;
         params.push(rol);
       }
 
@@ -235,23 +234,28 @@ class User {
       if (status) {
         paramCount++;
         const isActive = status === "active";
-        query += ` AND "isActive" = $${paramCount}`;
+        query += ` AND isActive = ?`;
         params.push(isActive);
       }
 
       // Contar total de registros
-      const countQuery = query.replace("SELECT *", "SELECT COUNT(*)");
+      const countQuery = query.replace("SELECT *", "SELECT COUNT(*) as count");
+
       const countResult = await db.query(countQuery, params);
       const totalUsers = parseInt(countResult.rows[0].count);
 
       // Agregar paginación
       const offset = (page - 1) * limit;
-      query += ` ORDER BY "createdAt" DESC LIMIT $${paramCount + 1} OFFSET $${
+      query += ` ORDER BY createdAt DESC LIMIT $${paramCount + 1} OFFSET $${
         paramCount + 2
       }`;
       params.push(limit, offset);
 
       // Ejecutar consulta principal
+      console.log("QUERY");
+      console.log(query);
+      console.log("PARAMS");
+      console.log(params);
       const result = await db.query(query, params);
 
       // Convertir resultados a instancias de User

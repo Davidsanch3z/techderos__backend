@@ -97,20 +97,7 @@ class Providers {
 
     return db
       .query(query, values)
-      .then(
-        () =>
-          new Providers({
-            title: data.title,
-            owner_name: data.ownerName,
-            phone_number: data.phoneNumber,
-            whatsapp_number: data.whatsappNumber,
-            email: data.email,
-            address: data.address,
-            delivery_day: data.deliveryDay,
-            user_id: data.userId,
-            object_id: data.objectId,
-          })
-      )
+      .then((result) => Providers.findById(result.rows.insertId))
       .catch((error) => {
         throw error;
       });
@@ -160,19 +147,19 @@ class Providers {
     } = data;
 
     const query = `
-    UPDATE providers
-    SET
-      title = COALESCE(?, title),
-      owner_name = COALESCE(?, owner_name),
-      phone_number = COALESCE(?, phone_number),
-      whatsapp_number = COALESCE(?, whatsapp_number),
-      email = COALESCE(?, email),
-      address = COALESCE(?, address),
-      delivery_day = COALESCE(?, delivery_day),
-      is_active = COALESCE(?, is_active),
-      object_id = ?
-    WHERE id = ?;
-  `;
+      UPDATE providers
+      SET
+        title = COALESCE(?, title),
+        owner_name = COALESCE(?, owner_name),
+        phone_number = COALESCE(?, phone_number),
+        whatsapp_number = COALESCE(?, whatsapp_number),
+        email = COALESCE(?, email),
+        address = COALESCE(?, address),
+        delivery_day = COALESCE(?, delivery_day),
+        is_active = COALESCE(?, is_active),
+        object_id = ?
+      WHERE id = ?;
+    `;
 
     const values = [
       title ?? null,
@@ -189,13 +176,7 @@ class Providers {
 
     try {
       await db.query(query, values);
-      const check = "SELECT * FROM providers WHERE id = $1";
-      const check_result = await db.query(check, [id]);
-
-      if (check_result.rows.length === 0) {
-        return null;
-      }
-      return new Providers(check_result.rows[0]);
+      return Providers.findById(id)
     } catch (error) {
       console.error("Error updating provider:", error);
       throw error;
