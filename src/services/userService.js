@@ -102,6 +102,7 @@ class UserService {
    */
   async updateUser(userId, updateData) {
     try {
+      console.log("dkskdjskdskjdksjdksj")
       const user = await User.findById(userId);
       if (!user) {
         const error = new Error("Usuario no encontrado");
@@ -111,6 +112,8 @@ class UserService {
 
       // Validaciones de negocio
       await this.validateUserUpdate(user, updateData);
+      console.log("ACA ESTA EL ERRRRRORORO")
+
 
       // Aplicar actualizaciones
       Object.keys(updateData).forEach((key) => {
@@ -439,16 +442,6 @@ class UserService {
       updateData.email_verification_token = require("crypto")
         .randomBytes(32)
         .toString("hex");
-    }
-
-    // Validar cambio de rol
-    if (updateData.rol && updateData.rol !== user.rol) {
-      const role = await Role.findByName(updateData.rol);
-      if (!role) {
-        const error = new Error("Rol especificado no válido");
-        error.statusCode = 400;
-        throw error;
-      }
     }
 
     // Validar cambio de estado
