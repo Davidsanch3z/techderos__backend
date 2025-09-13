@@ -103,6 +103,21 @@ class salesController {
     }
   }
 
+  async getByDni(req, res) {
+    try {
+      const itemId = req.params.id;
+      const result = await saleService.findByUserDni(itemId);
+      if (!result) {
+        res.status(404).json({ error: "Not found" });
+        return;
+      }
+
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ error });
+    }
+  }
+
   /**
    * Delete an sales item by ID for the authenticated user
    * DELETE /api/inventory/delete/:id

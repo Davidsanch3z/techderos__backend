@@ -98,6 +98,22 @@ class Sale {
       });
   }
 
+  static findByUserDni(dni) {
+    const query =
+      "SELECT * FROM sales_pd WHERE dni = $1";
+    return db
+      .query(query, [dni])
+      .then((result) => {
+        if (result.rows.length === 0) {
+          return null;
+        }
+        return new Sale(result.rows[0]);
+      })
+      .catch((error) => {
+        throw error;
+      });
+  }
+
   static findByUserId(userId) {
     const query = "SELECT * FROM sales_pd WHERE user_id = $1";
     return db
