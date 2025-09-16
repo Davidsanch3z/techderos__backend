@@ -84,13 +84,13 @@ class Providers {
   `;
 
     const values = [
-      data.title,
-      data.ownerName,
-      data.phoneNumber,
-      data.whatsappNumber,
-      data.email,
-      data.address,
-      data.deliveryDay,
+      data.title ?? null,
+      data.ownerName ?? null,
+      data.phoneNumber ?? null,
+      data.whatsappNumber ?? null,
+      data.email ?? null,
+      data.address ?? null,
+      data.deliveryDay ?? null,
       data.objectId ?? null,
       userId,
     ];
@@ -176,7 +176,7 @@ class Providers {
 
     try {
       await db.query(query, values);
-      return Providers.findById(id)
+      return Providers.findById(id);
     } catch (error) {
       console.error("Error updating provider:", error);
       throw error;

@@ -59,12 +59,14 @@ CREATE TABLE IF NOT EXISTS providers (
     phone_number VARCHAR(20),
     whatsapp_number VARCHAR(20),
     email VARCHAR(150),
-    user_id VARCHAR(100),
+    user_id CHAR(36),
     address VARCHAR(255),
     delivery_day VARCHAR(250),
     object_id VARCHAR(255),
-    is_active BOOLEAN DEFAULT TRUE
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT fk_providers_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
 
 CREATE TABLE IF NOT EXISTS sales_pd (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -74,10 +76,11 @@ CREATE TABLE IF NOT EXISTS sales_pd (
     products TEXT,
     payment_method VARCHAR(100),
     total DECIMAL(10, 2) NOT NULL,
-    user_id VARCHAR(255),
+    user_id CHAR(36),
     amount INT DEFAULT 0,
     dni VARCHAR(50),
-    address VARCHAR(255)
+    address VARCHAR(255),
+    CONSTRAINT fk_sales_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS inventory_pd (
@@ -86,24 +89,27 @@ CREATE TABLE IF NOT EXISTS inventory_pd (
     price DECIMAL(10, 2) NOT NULL,
     quantity INT NOT NULL,
     category VARCHAR(100),
-    user_id VARCHAR(100),
+    user_id CHAR(36),
     supplier_name VARCHAR(100),
     presentation VARCHAR(50),
     expiration_date VARCHAR(250),
-    profit_margin DECIMAL(10, 2)
+    profit_margin DECIMAL(10, 2),
+    CONSTRAINT fk_inventory_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS objects (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    user_id VARCHAR(100)
+    user_id CHAR(36),
+    CONSTRAINT fk_objects_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS qrs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100),
     object_id VARCHAR(100),
-    user_id VARCHAR(100)
+    user_id CHAR(36),
+    CONSTRAINT fk_qrs_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS orders_pd (
@@ -113,5 +119,6 @@ CREATE TABLE IF NOT EXISTS orders_pd (
     quantity VARCHAR(100),
     date VARCHAR(100),
     status VARCHAR(100),
-    user_id VARCHAR(100)
+    user_id VARCHAR(100),
+    CONSTRAINT fk_orders_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
