@@ -105,3 +105,13 @@ CREATE TABLE IF NOT EXISTS qrs (
     object_id VARCHAR(100),
     user_id VARCHAR(100)
 );
+
+CREATE TABLE IF NOT EXISTS orders_pd (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product VARCHAR(100),
+    supplier VARCHAR(100),
+    quantity VARCHAR(100),
+    date VARCHAR(100),
+    status VARCHAR(100),
+    user_id VARCHAR(100)
+);
