@@ -259,10 +259,22 @@ class AuthController {
 
   async verifyServiceStatus(req, res) {
     try {
-      await fetch("https://check.soyteo.co/");
-      return res.status(200).json({});
-    } catch {
-      return res.status(401).json({});
+      const response = await fetch("https://check.soyteo.co/ok");
+
+      // Si el status no es 200, lanzamos un error
+      if (response.status !== 200) {
+        return res.status(500).json({
+          ok: false,
+          status: response.status,
+          message: "Backend no disponible",
+        });
+      }
+
+      // Si todo está OK
+      return res.status(200).json({ ok: true });
+    } catch (err) {
+      // Error de red o cualquier otra excepción
+      return res.status(500).json({ ok: false, message: err.message });
     }
   }
 
