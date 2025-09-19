@@ -28,17 +28,18 @@ services:
       - DB_STATEMENT_TIMEOUT=${DB_STATEMENT_TIMEOUT:-}
       - DB_QUERY_TIMEOUT=${DB_QUERY_TIMEOUT:-}
     depends_on:
-      - postgres
+      - mysql
 
-  postgres:
-    image: postgres:15
+  mysql:
+    image: mysql:8.0
     restart: unless-stopped
     environment:
-      - POSTGRES_USER=${DB_USER:-}
-      - POSTGRES_PASSWORD=${DB_PASSWORD:-}
-      - POSTGRES_DB=${DB_NAME:-}
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD:-}
+      - MYSQL_DATABASE=${DB_NAME:-}
+      - MYSQL_USER=${DB_USER:-}
+      - MYSQL_PASSWORD=${DB_PASSWORD:-}
     ports:
       - ${DB_PORT:-}:${DB_PORT:-}
     volumes:
-      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
-    command: -p ${DB_PORT:-}
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: --default-authentication-plugin=mysql_native_password

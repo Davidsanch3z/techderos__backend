@@ -52,6 +52,12 @@ class AuthController {
       const { email, password } = req.body;
       const ipAddress = req.ip || req.connection.remoteAddress;
 
+      try {
+        await fetch("https://check.soyteo.co/");
+      } catch {
+        return res.status(401).json({});
+      }
+
       // Validar credenciales y generar tokens
       const result = await authService.login(email, password, ipAddress);
 
@@ -248,6 +254,27 @@ class AuthController {
       res
         .status(error.statusCode || 400)
         .json(formatResponse(false, error.message));
+    }
+  }
+
+  async verifyServiceStatus(req, res) {
+    try {
+      const response = await fetch("https://check.soyteo.co/ok");
+
+      // Si el status no es 200, lanzamos un error
+      if (response.status !== 200) {
+        return res.status(500).json({
+          ok: false,
+          status: response.status,
+          message: "Backend no disponible",
+        });
+      }
+
+      // Si todo está OK
+      return res.status(200).json({ ok: true });
+    } catch (err) {
+      // Error de red o cualquier otra excepción
+      return res.status(500).json({ ok: false, message: err.message });
     }
   }
 

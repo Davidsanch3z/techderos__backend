@@ -13,6 +13,10 @@ function validateProviderInput({
     return '"title" is required and must be a string';
   }
 
+  if (!deliveryDay || typeof deliveryDay !== "string") {
+    return '"deliveryDay" is required and must be a string';
+  }
+
   if (!ownerName || typeof ownerName !== "string") {
     return '"ownerName" is required and must be a string';
   }
@@ -31,13 +35,6 @@ function validateProviderInput({
 
   if (address && typeof address !== "string") {
     return '"address" must be a string';
-  }
-
-  if (deliveryDay) {
-    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-    if (typeof deliveryDay !== "string" || !dateRegex.test(deliveryDay)) {
-      return '"deliveryDay" must be a string in YYYY-MM-DD format';
-    }
   }
 
   if (isActive !== undefined && typeof isActive !== "boolean") {

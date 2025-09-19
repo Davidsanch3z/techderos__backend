@@ -37,6 +37,7 @@
     "joi": "^17.9.2",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
+    "mysql2-promise": "^0.1.4",
     "nodemailer": "^6.9.4",
     "pg": "^8.11.3",
     "redis": "^4.6.8",

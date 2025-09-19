@@ -33,12 +33,7 @@ function validateInventoryInput({
   }
 
   if (!expirationDate || typeof expirationDate !== "string") {
-    return '"expirationDate" is required and must be a string in YYYY-MM-DD format';
-  } else {
-    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-    if (!dateRegex.test(expirationDate)) {
-      return '"expirationDate" must be in YYYY-MM-DD format';
-    }
+    return '"expirationDate" is required';
   }
 
   if (profitMargin === undefined || isNaN(profitMargin)) {

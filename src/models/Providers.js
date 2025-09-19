@@ -79,35 +79,32 @@ class Providers {
   static create(data, userId) {
     const query = `
     INSERT INTO providers 
-      (title, owner_name, phone_number, whatsapp_number, email, address, delivery_day, is_active, object_id, user_id)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-    RETURNING *;
+      (title, owner_name, phone_number, whatsapp_number, email, address, delivery_day, object_id, user_id)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
   `;
 
     const values = [
-      data.title,
-      data.ownerName,
-      data.phoneNumber,
-      data.whatsappNumber,
-      data.email,
-      data.address,
-      data.deliveryDay,
-      data.isActive ?? true,
+      data.title ?? null,
+      data.ownerName ?? null,
+      data.phoneNumber ?? null,
+      data.whatsappNumber ?? null,
+      data.email ?? null,
+      data.address ?? null,
+      data.deliveryDay ?? null,
       data.objectId ?? null,
       userId,
     ];
 
     return db
       .query(query, values)
-      .then((result) => new Providers(result.rows[0]))
+      .then((result) => Providers.findById(result.rows.insertId))
       .catch((error) => {
         throw error;
       });
   }
 
   static deleteByIdAndUserId(id, userId) {
-    const query =
-      "DELETE FROM providers WHERE id = $1 AND user_id = $2 RETURNING *";
+    const query = "DELETE FROM providers WHERE id = $1 AND user_id = $2;";
     return db
       .query(query, [id, userId])
       .then((result) => {
@@ -150,20 +147,19 @@ class Providers {
     } = data;
 
     const query = `
-    UPDATE providers
-    SET
-      title = COALESCE($1, title),
-      owner_name = COALESCE($2, owner_name),
-      phone_number = COALESCE($3, phone_number),
-      whatsapp_number = COALESCE($4, whatsapp_number),
-      email = COALESCE($5, email),
-      address = COALESCE($6, address),
-      delivery_day = COALESCE($7, delivery_day),
-      is_active = COALESCE($8, is_active),
-      object_id = $9
-    WHERE id = $10
-    RETURNING *;
-  `;
+      UPDATE providers
+      SET
+        title = COALESCE(?, title),
+        owner_name = COALESCE(?, owner_name),
+        phone_number = COALESCE(?, phone_number),
+        whatsapp_number = COALESCE(?, whatsapp_number),
+        email = COALESCE(?, email),
+        address = COALESCE(?, address),
+        delivery_day = COALESCE(?, delivery_day),
+        is_active = COALESCE(?, is_active),
+        object_id = ?
+      WHERE id = ?;
+    `;
 
     const values = [
       title ?? null,
@@ -179,11 +175,8 @@ class Providers {
     ];
 
     try {
-      const result = await db.query(query, values);
-      if (result.rows.length === 0) {
-        return null;
-      }
-      return new Providers(result.rows[0]);
+      await db.query(query, values);
+      return Providers.findById(id);
     } catch (error) {
       console.error("Error updating provider:", error);
       throw error;

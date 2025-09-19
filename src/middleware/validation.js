@@ -8,9 +8,9 @@
  * - checkRequiredFields: Verificar campos obligatorios
  */
 
-const Joi = require('joi');
-const logger = require('../utils/logger');
-const { formatResponse } = require('../utils/helpers');
+const Joi = require("joi");
+const logger = require("../utils/logger");
+const { formatResponse } = require("../utils/helpers");
 
 /**
  * Schema de validación para registro de usuario
@@ -23,10 +23,10 @@ const registerSchema = Joi.object({
     .pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)
     .required()
     .messages({
-      'string.pattern.base': 'El nombre solo puede contener letras y espacios',
-      'string.min': 'El nombre debe tener al menos 2 caracteres',
-      'string.max': 'El nombre no puede exceder 100 caracteres',
-      'any.required': 'El nombre es requerido'
+      "string.pattern.base": "El nombre solo puede contener letras y espacios",
+      "string.min": "El nombre debe tener al menos 2 caracteres",
+      "string.max": "El nombre no puede exceder 100 caracteres",
+      "any.required": "El nombre es requerido",
     }),
 
   email: Joi.string()
@@ -36,9 +36,9 @@ const registerSchema = Joi.object({
     .lowercase()
     .required()
     .messages({
-      'string.email': 'Debe ser un email válido',
-      'string.max': 'El email no puede exceder 255 caracteres',
-      'any.required': 'El email es requerido'
+      "string.email": "Debe ser un email válido",
+      "string.max": "El email no puede exceder 255 caracteres",
+      "any.required": "El email es requerido",
     }),
 
   password: Joi.string()
@@ -47,34 +47,37 @@ const registerSchema = Joi.object({
     .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
     .required()
     .messages({
-      'string.pattern.base': 'La contraseña debe contener al menos: 1 minúscula, 1 mayúscula, 1 número y 1 carácter especial (@$!%*?&)',
-      'string.min': 'La contraseña debe tener al menos 8 caracteres',
-      'string.max': 'La contraseña no puede exceder 128 caracteres',
-      'any.required': 'La contraseña es requerida'
+      "string.pattern.base":
+        "La contraseña debe contener al menos: 1 minúscula, 1 mayúscula, 1 número y 1 carácter especial (@$!%*?&)",
+      "string.min": "La contraseña debe tener al menos 8 caracteres",
+      "string.max": "La contraseña no puede exceder 128 caracteres",
+      "any.required": "La contraseña es requerida",
     }),
 
   telefono: Joi.string()
     .pattern(/^[3][0-9]{9}$/)
     .optional()
-    .allow('')
+    .allow("")
     .messages({
-      'string.pattern.base': 'El teléfono debe tener formato válido de Colombia (10 dígitos iniciando en 3)'
+      "string.pattern.base":
+        "El teléfono debe tener formato válido de Colombia (10 dígitos iniciando en 3)",
     }),
 
   tipo_negocio: Joi.string()
-    .valid('tienda', 'supermercado', 'farmacia', 'restaurante', 'otro')
+    .valid("tienda", "supermercado", "farmacia", "restaurante", "otro")
     .required()
     .messages({
-      'any.only': 'Tipo de negocio debe ser: tienda, supermercado, farmacia, restaurante u otro',
-      'any.required': 'El tipo de negocio es requerido'
+      "any.only":
+        "Tipo de negocio debe ser: tienda, supermercado, farmacia, restaurante u otro",
+      "any.required": "El tipo de negocio es requerido",
     }),
 
   rol: Joi.string()
-    .valid('tendero', 'administrador', 'supervisor')
-    .default('tendero')
+    .valid("tendero", "administrador", "supervisor")
+    .default("tendero")
     .messages({
-      'any.only': 'Rol debe ser: tendero, administrador o supervisor'
-    })
+      "any.only": "Rol debe ser: tendero, administrador o supervisor",
+    }),
 });
 
 /**
@@ -88,10 +91,10 @@ const createUserSchema = Joi.object({
     .pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)
     .required()
     .messages({
-      'string.pattern.base': 'El nombre solo puede contener letras y espacios',
-      'string.min': 'El nombre debe tener al menos 2 caracteres',
-      'string.max': 'El nombre no puede exceder 100 caracteres',
-      'any.required': 'El nombre es requerido'
+      "string.pattern.base": "El nombre solo puede contener letras y espacios",
+      "string.min": "El nombre debe tener al menos 2 caracteres",
+      "string.max": "El nombre no puede exceder 100 caracteres",
+      "any.required": "El nombre es requerido",
     }),
 
   email: Joi.string()
@@ -101,27 +104,23 @@ const createUserSchema = Joi.object({
     .lowercase()
     .required()
     .messages({
-      'string.email': 'Debe ser un email válido',
-      'string.max': 'El email no puede exceder 255 caracteres',
-      'any.required': 'El email es requerido'
+      "string.email": "Debe ser un email válido",
+      "string.max": "El email no puede exceder 255 caracteres",
+      "any.required": "El email es requerido",
     }),
 
-  password: Joi.string()
-    .min(6)
-    .max(128)
-    .required()
-    .messages({
-      'string.min': 'La contraseña debe tener al menos 6 caracteres',
-      'string.max': 'La contraseña no puede exceder 128 caracteres',
-      'any.required': 'La contraseña es requerida'
-    }),
+  password: Joi.string().min(6).max(128).required().messages({
+    "string.min": "La contraseña debe tener al menos 6 caracteres",
+    "string.max": "La contraseña no puede exceder 128 caracteres",
+    "any.required": "La contraseña es requerida",
+  }),
 
   rol: Joi.string()
-    .valid('usuario', 'administrador', 'moderador')
-    .default('usuario')
+    .valid("usuario", "administrador", "moderador")
+    .default("usuario")
     .messages({
-      'any.only': 'Rol debe ser: usuario, administrador o moderador'
-    })
+      "any.only": "Rol debe ser: usuario, administrador o moderador",
+    }),
 });
 
 /**
@@ -133,15 +132,13 @@ const loginSchema = Joi.object({
     .email({ tlds: { allow: false } })
     .required()
     .messages({
-      'string.email': 'Debe ser un email válido',
-      'any.required': 'El email es requerido'
+      "string.email": "Debe ser un email válido",
+      "any.required": "El email es requerido",
     }),
 
-  password: Joi.string()
-    .required()
-    .messages({
-      'any.required': 'La contraseña es requerida'
-    })
+  password: Joi.string().required().messages({
+    "any.required": "La contraseña es requerida",
+  }),
 });
 
 /**
@@ -155,36 +152,36 @@ const updateProfileSchema = Joi.object({
     .pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)
     .optional()
     .messages({
-      'string.pattern.base': 'El nombre solo puede contener letras y espacios',
-      'string.min': 'El nombre debe tener al menos 2 caracteres',
-      'string.max': 'El nombre no puede exceder 100 caracteres'
+      "string.pattern.base": "El nombre solo puede contener letras y espacios",
+      "string.min": "El nombre debe tener al menos 2 caracteres",
+      "string.max": "El nombre no puede exceder 100 caracteres",
     }),
 
   telefono: Joi.string()
     .pattern(/^[3][0-9]{9}$/)
     .optional()
-    .allow('')
+    .allow("")
     .messages({
-      'string.pattern.base': 'El teléfono debe tener formato válido de Colombia (10 dígitos iniciando en 3)'
+      "string.pattern.base":
+        "El teléfono debe tener formato válido de Colombia (10 dígitos iniciando en 3)",
     }),
 
   tipo_negocio: Joi.string()
-    .valid('tienda', 'supermercado', 'farmacia', 'restaurante', 'otro')
+    .valid("tienda", "supermercado", "farmacia", "restaurante", "otro")
     .optional()
     .messages({
-      'any.only': 'Tipo de negocio debe ser: tienda, supermercado, farmacia, restaurante u otro'
-    })
+      "any.only":
+        "Tipo de negocio debe ser: tienda, supermercado, farmacia, restaurante u otro",
+    }),
 });
 
 /**
  * Schema de validación para cambio de contraseña
  */
 const changePasswordSchema = Joi.object({
-  currentPassword: Joi.string()
-    .required()
-    .messages({
-      'any.required': 'La contraseña actual es requerida'
-    }),
+  currentPassword: Joi.string().required().messages({
+    "any.required": "La contraseña actual es requerida",
+  }),
 
   newPassword: Joi.string()
     .min(8)
@@ -192,76 +189,102 @@ const changePasswordSchema = Joi.object({
     .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
     .required()
     .messages({
-      'string.pattern.base': 'La nueva contraseña debe contener al menos: 1 minúscula, 1 mayúscula, 1 número y 1 carácter especial (@$!%*?&)',
-      'string.min': 'La nueva contraseña debe tener al menos 8 caracteres',
-      'string.max': 'La nueva contraseña no puede exceder 128 caracteres',
-      'any.required': 'La nueva contraseña es requerida'
+      "string.pattern.base":
+        "La nueva contraseña debe contener al menos: 1 minúscula, 1 mayúscula, 1 número y 1 carácter especial (@$!%*?&)",
+      "string.min": "La nueva contraseña debe tener al menos 8 caracteres",
+      "string.max": "La nueva contraseña no puede exceder 128 caracteres",
+      "any.required": "La nueva contraseña es requerida",
     }),
 
   confirmPassword: Joi.string()
-    .valid(Joi.ref('newPassword'))
+    .valid(Joi.ref("newPassword"))
     .required()
     .messages({
-      'any.only': 'La confirmación de contraseña debe coincidir con la nueva contraseña',
-      'any.required': 'La confirmación de contraseña es requerida'
-    })
+      "any.only":
+        "La confirmación de contraseña debe coincidir con la nueva contraseña",
+      "any.required": "La confirmación de contraseña es requerida",
+    }),
 });
 
 /**
  * Schema de validación para actualización de perfil
  */
 const updateUserSchema = Joi.object({
-  nombre: Joi.string()
+  name: Joi.string()
     .trim()
     .min(2)
     .max(100)
     .pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)
     .optional()
     .messages({
-      'string.pattern.base': 'El nombre solo puede contener letras y espacios',
-      'string.min': 'El nombre debe tener al menos 2 caracteres',
-      'string.max': 'El nombre no puede exceder 100 caracteres'
+      "string.pattern.base": "El nombre solo puede contener letras y espacios",
+      "string.min": "El nombre debe tener al menos 2 caracteres",
+      "string.max": "El nombre no puede exceder 100 caracteres",
+    }),
+
+  email: Joi.string()
+    .trim()
+    .email({ tlds: { allow: false } }) // valida formato email, sin restringir TLDs
+    .max(255)
+    .required()
+    .messages({
+      "string.email": "El correo electrónico no es válido",
+      "string.empty": "El correo electrónico es obligatorio",
+      "string.max": "El correo electrónico no puede exceder 255 caracteres",
+    }),
+
+  password: Joi.string()
+    .min(8)
+    .max(128)
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+    .optional()
+    .messages({
+      "string.pattern.base":
+        "La nueva contraseña debe contener al menos: 1 minúscula, 1 mayúscula, 1 número y 1 carácter especial (@$!%*?&)",
+      "string.min": "La nueva contraseña debe tener al menos 8 caracteres",
+      "string.max": "La nueva contraseña no puede exceder 128 caracteres",
+      "any.required": "La nueva contraseña es requerida",
     }),
 
   telefono: Joi.string()
     .pattern(/^[3][0-9]{9}$/)
     .optional()
-    .allow('')
+    .allow("")
     .messages({
-      'string.pattern.base': 'El teléfono debe tener formato válido de Colombia (10 dígitos iniciando en 3)'
+      "string.pattern.base":
+        "El teléfono debe tener formato válido de Colombia (10 dígitos iniciando en 3)",
     }),
 
   tipo_negocio: Joi.string()
-    .valid('tienda', 'supermercado', 'farmacia', 'restaurante', 'otro')
+    .valid("tienda", "supermercado", "farmacia", "restaurante", "otro")
     .optional()
     .messages({
-      'any.only': 'Tipo de negocio debe ser: tienda, supermercado, farmacia, restaurante u otro'
+      "any.only":
+        "Tipo de negocio debe ser: tienda, supermercado, farmacia, restaurante u otro",
     }),
 
   rol: Joi.string()
-    .valid('tendero', 'administrador', 'supervisor')
+    .valid("tendero", "administrador", "supervisor")
     .optional()
     .messages({
-      'any.only': 'Rol debe ser: tendero, administrador o supervisor'
+      "any.only": "Rol debe ser: tendero, administrador o supervisor",
     }),
 
   status: Joi.string()
-    .valid('pending', 'active', 'inactive', 'suspended')
+    .valid("pending", "active", "inactive", "suspended")
     .optional()
     .messages({
-      'any.only': 'Status debe ser: pending, active, inactive o suspended'
-    })
+      "any.only": "Status debe ser: pending, active, inactive o suspended",
+    }),
 });
 
 /**
  * Schema de validación para cambio de contraseña
  */
 const passwordChangeSchema = Joi.object({
-  currentPassword: Joi.string()
-    .required()
-    .messages({
-      'any.required': 'La contraseña actual es requerida'
-    }),
+  currentPassword: Joi.string().required().messages({
+    "any.required": "La contraseña actual es requerida",
+  }),
 
   newPassword: Joi.string()
     .min(8)
@@ -269,22 +292,21 @@ const passwordChangeSchema = Joi.object({
     .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
     .required()
     .messages({
-      'string.pattern.base': 'La nueva contraseña debe contener al menos: 1 minúscula, 1 mayúscula, 1 número y 1 carácter especial (@$!%*?&)',
-      'string.min': 'La nueva contraseña debe tener al menos 8 caracteres',
-      'string.max': 'La nueva contraseña no puede exceder 128 caracteres',
-      'any.required': 'La nueva contraseña es requerida'
-    })
+      "string.pattern.base":
+        "La nueva contraseña debe contener al menos: 1 minúscula, 1 mayúscula, 1 número y 1 carácter especial (@$!%*?&)",
+      "string.min": "La nueva contraseña debe tener al menos 8 caracteres",
+      "string.max": "La nueva contraseña no puede exceder 128 caracteres",
+      "any.required": "La nueva contraseña es requerida",
+    }),
 });
 
 /**
  * Schema de validación para reset de contraseña
  */
 const passwordResetSchema = Joi.object({
-  token: Joi.string()
-    .required()
-    .messages({
-      'any.required': 'El token de reset es requerido'
-    }),
+  token: Joi.string().required().messages({
+    "any.required": "El token de reset es requerido",
+  }),
 
   newPassword: Joi.string()
     .min(8)
@@ -292,11 +314,12 @@ const passwordResetSchema = Joi.object({
     .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
     .required()
     .messages({
-      'string.pattern.base': 'La nueva contraseña debe contener al menos: 1 minúscula, 1 mayúscula, 1 número y 1 carácter especial (@$!%*?&)',
-      'string.min': 'La nueva contraseña debe tener al menos 8 caracteres',
-      'string.max': 'La nueva contraseña no puede exceder 128 caracteres',
-      'any.required': 'La nueva contraseña es requerida'
-    })
+      "string.pattern.base":
+        "La nueva contraseña debe contener al menos: 1 minúscula, 1 mayúscula, 1 número y 1 carácter especial (@$!%*?&)",
+      "string.min": "La nueva contraseña debe tener al menos 8 caracteres",
+      "string.max": "La nueva contraseña no puede exceder 128 caracteres",
+      "any.required": "La nueva contraseña es requerida",
+    }),
 });
 
 /**
@@ -307,24 +330,24 @@ const validateAndSanitize = (schema) => {
     const { error, value } = schema.validate(req.body, {
       abortEarly: false,
       stripUnknown: true,
-      convert: true
+      convert: true,
     });
 
     if (error) {
-      const errors = error.details.map(detail => ({
-        field: detail.path.join('.'),
-        message: detail.message
+      const errors = error.details.map((detail) => ({
+        field: detail.path.join("."),
+        message: detail.message,
       }));
 
-      logger.warn('Validación fallida:', {
+      logger.warn("Validación fallida:", {
         endpoint: req.originalUrl,
         method: req.method,
-        errors
+        errors,
       });
 
-      return res.status(400).json(
-        formatResponse(false, 'Datos de entrada inválidos', { errors })
-      );
+      return res
+        .status(400)
+        .json(formatResponse(false, "Datos de entrada inválidos", { errors }));
     }
 
     // Reemplazar req.body con los datos validados y sanitizados
@@ -369,8 +392,7 @@ const validatePasswordReset = validateAndSanitize(passwordResetSchema);
 const sanitizeQuery = (allowedParams = []) => {
   return (req, res, next) => {
     const sanitizedQuery = {};
-    
-    allowedParams.forEach(param => {
+    allowedParams.forEach((param) => {
       if (req.query[param] !== undefined) {
         sanitizedQuery[param] = req.query[param];
       }
@@ -389,14 +411,14 @@ const validateParams = (schema) => {
     const { error, value } = schema.validate(req.params);
 
     if (error) {
-      const errors = error.details.map(detail => ({
-        field: detail.path.join('.'),
-        message: detail.message
+      const errors = error.details.map((detail) => ({
+        field: detail.path.join("."),
+        message: detail.message,
       }));
 
-      return res.status(400).json(
-        formatResponse(false, 'Parámetros de URL inválidos', { errors })
-      );
+      return res
+        .status(400)
+        .json(formatResponse(false, "Parámetros de URL inválidos", { errors }));
     }
 
     req.params = value;
@@ -408,13 +430,10 @@ const validateParams = (schema) => {
  * Schema para validar UUID en parámetros
  */
 const uuidParamSchema = Joi.object({
-  id: Joi.string()
-    .guid({ version: 'uuidv4' })
-    .required()
-    .messages({
-      'string.guid': 'ID debe ser un UUID válido',
-      'any.required': 'ID es requerido'
-    })
+  id: Joi.string().guid({ version: "uuidv4" }).required().messages({
+    "string.guid": "ID debe ser un UUID válido",
+    "any.required": "ID es requerido",
+  }),
 });
 
 /**
@@ -443,5 +462,5 @@ module.exports = {
   validateChangePassword,
   validateUuidParam,
   sanitizeQuery,
-  validateParams
+  validateParams,
 };

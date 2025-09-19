@@ -14,9 +14,24 @@ class Inventory {
     this.profitMargin = data.profit_margin;
   }
 
+  static findById(itemId) {
+    const query = "SELECT * FROM inventory_pd WHERE id = $1 LIMIT 1";
+    return db
+      .query(query, [itemId])
+      .then((result) => {
+        if (result.rows.length === 0) {
+          return null;
+        }
+        return new Inventory(result.rows[0]);
+      })
+      .catch((error) => {
+        throw error;
+      });
+  }
+
   static findByUserIdAndItemId(userId, itemId) {
     const query =
-      'SELECT * FROM "inventory_pd" WHERE user_id = $1 AND id = $2 LIMIT 1';
+      "SELECT * FROM inventory_pd WHERE user_id = $1 AND id = $2 LIMIT 1";
     return db
       .query(query, [userId, itemId])
       .then((result) => {
@@ -31,7 +46,7 @@ class Inventory {
   }
 
   static findByUserId(userId) {
-    const query = 'SELECT * FROM "inventory_pd" WHERE user_id = $1';
+    const query = "SELECT * FROM inventory_pd WHERE user_id = $1";
     return db
       .query(query, [userId])
       .then((result) => result.rows.map((row) => new Inventory(row)))
@@ -56,8 +71,7 @@ class Inventory {
       name, price, quantity, category, user_id,
       supplier_name, presentation, expiration_date, profit_margin
     )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-    RETURNING *;
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
   `;
 
     const values = [
@@ -74,9 +88,8 @@ class Inventory {
 
     return db
       .query(query, values)
-      .then((result) => new Inventory(result.rows[0]))
+      .then((result) => Inventory.findById(result.rows.insertId))
       .catch((error) => {
-        console.error("Error inserting inventory item:", error);
         throw error;
       });
   }
@@ -94,19 +107,18 @@ class Inventory {
     } = data;
 
     const query = `
-    UPDATE inventory_pd
-    SET
-      name = COALESCE($1, name),
-      price = COALESCE($2, price),
-      quantity = COALESCE($3, quantity),
-      category = COALESCE($4, category),
-      supplier_name = COALESCE($5, supplier_name),
-      presentation = COALESCE($6, presentation),
-      expiration_date = COALESCE($7, expiration_date),
-      profit_margin = COALESCE($8, profit_margin)
-    WHERE id = $9
-    RETURNING *;
-  `;
+      UPDATE inventory_pd
+      SET
+        name = COALESCE(?, name),
+        price = COALESCE(?, price),
+        quantity = COALESCE(?, quantity),
+        category = COALESCE(?, category),
+        supplier_name = COALESCE(?, supplier_name),
+        presentation = COALESCE(?, presentation),
+        expiration_date = COALESCE(?, expiration_date),
+        profit_margin = COALESCE(?, profit_margin)
+      WHERE id = ?;
+    `;
 
     const values = [
       name ?? null,
@@ -121,11 +133,8 @@ class Inventory {
     ];
 
     try {
-      const result = await db.query(query, values);
-      if (result.rows.length === 0) {
-        return null;
-      }
-      return new Inventory(result.rows[0]);
+      await db.query(query, values);
+      return Inventory.findById(id);
     } catch (error) {
       console.error("Error updating inventory item:", error);
       throw error;
@@ -135,9 +144,8 @@ class Inventory {
   static async deleteByUserIdAndItemId(userId, itemId) {
     const query = `
     DELETE FROM inventory_pd
-    WHERE id = $1 AND user_id = $2
-    RETURNING *;
-  `;
+    WHERE id = $1 AND user_id = $2;
+    `;
     const values = [itemId, userId];
     const result = await db.query(query, values);
 

@@ -17,11 +17,13 @@ class SaleService {
     return sales.findByUserIdAndItemId(userId, itemId);
   }
 
+  async findByUserDni(dni) {
+    return sales.findByUserDni(dni);
+  }
+
   async create(data) {
     return sales.create(data);
   }
 }
-
-
 
 module.exports = new SaleService();
