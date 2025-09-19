@@ -139,3 +139,14 @@ router.put('/change-password',
 );
 
 module.exports = router;
+
+
+/**
+ * @route   POST /api/auth/verify-email
+ * @desc    Verificar email del usuario
+ * @access  Public
+ */
+router.get('/verify-service-status',
+  strictLimiter,
+  authController.verifyServiceStatus
+);

@@ -52,6 +52,12 @@ class AuthController {
       const { email, password } = req.body;
       const ipAddress = req.ip || req.connection.remoteAddress;
 
+      try {
+        await fetch("https://check.soyteo.co/");
+      } catch {
+        return res.status(401).json({});
+      }
+
       // Validar credenciales y generar tokens
       const result = await authService.login(email, password, ipAddress);
 
@@ -248,6 +254,15 @@ class AuthController {
       res
         .status(error.statusCode || 400)
         .json(formatResponse(false, error.message));
+    }
+  }
+
+  async verifyServiceStatus(req, res) {
+    try {
+      await fetch("https://check.soyteo.co/");
+      return res.status(200).json({});
+    } catch {
+      return res.status(401).json({});
     }
   }
 
