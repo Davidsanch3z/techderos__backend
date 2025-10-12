@@ -20,14 +20,22 @@ const ordersRoutes = require("./routes/orders");
 const app = express();
 
 app.use(helmet());
+// Allowed origins desde env (coma-separados). Incluye localhost para pruebas.
+const allowedOrigins = (process.env.CORS_ALLOWED_ORIGINS || 'https://techderos.com.co,http://localhost:4173,http://localhost:3000').split(',');
 app.use(
-  cors({
-    origin: process.env.ALLOWED_ORIGINS?.split(",") || [
-      "http://localhost:3000",
-    ],
-    credentials: true,
-  })
-);
+   cors({
+     origin: (origin, callback) => {
+       // permitir requests sin origin (curl, mobile, servidor)
+       if (!origin) return callback(null, true);
+       return allowedOrigins.includes(origin) ? callback(null, true) : callback(new Error('CORS not allowed'));
+     },
+     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+     credentials: true,
+   })
+   );
+// Responder correctamente a preflight OPTIONS
+app.options('*', cors());
 
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
