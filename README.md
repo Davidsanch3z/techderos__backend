@@ -1,9 +1,3 @@
-Perfecto, ya te entendí 👍
-Te lo dejo **ordenado, limpio y fluido**, con formato **README profesional**, sin verse como columnas ni tablas innecesarias, usando párrafos claros y secciones bien jerarquizadas.
-
-Puedes copiarlo **tal cual** como `README.md`.
-
----
 
 # 🚀 Gestión Comercial – Microservicio de Usuarios (Techderos Backend)
 
@@ -56,7 +50,62 @@ La base de datos puede ser MySQL o PostgreSQL, usando conexiones optimizadas por
 Se utiliza Redis para cache y sesiones, JWT para autenticación, Winston y Morgan para logging, y herramientas modernas como ESLint, Prettier y Jest para desarrollo y testing.
 
 ---
+## 🚀 Inicio Rápido (Tutorial de Instalación)
 
+Sigue estos pasos para levantar el entorno de desarrollo localmente.
+
+### Prerrequisitos
+- Node.js (v18+)
+- MySQL (corriendo localmente o en Docker)
+
+### Paso 1: Clonar e Instalar
+Asegúrate de estar en la rama correcta (`prueba`):
+
+```bash
+# Instalar dependencias
+npm install
+```
+
+### Paso 2: Configurar Variables de Entorno
+Crea un archivo `.env` en la raíz (puedes copiar `.env.template`).
+**Importante:** Para desarrollo local (sin Docker para la app), ajusta `DB_HOST` a `localhost`.
+
+Archivo `.env` recomendado para local:
+```ini
+NODE_ENV=development
+PORT_SERVER=3002
+# Configuración de Base de Datos
+DB_HOST=localhost
+DB_USER=tusuario
+DB_PASSWORD=tupassword
+DB_NAME=usuarios_service
+DB_PORT=3306 
+# CORS
+CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3001
+JWT_SECRET=tu_secreto_super_seguro
+```
+
+### Paso 3: Ejecutar el Proyecto
+Para desarrollo con recarga automática:
+
+```bash
+npm run dev
+```
+El servidor iniciará en `http://localhost:3002`.
+
+---
+
+## Usuarios de Prueba
+
+Se ha creado un usuario predeterminado en esta rama para facilitar tus pruebas inmediatas:
+
+| Rol | Email | Contraseña |
+|-----|-------|------------|
+| **Tienda** | `prueba@techderos.com` | `Password123!` |
+
+> Puedes usar estas credenciales para hacer login (`POST /api/auth/login`) y obtener un token JWT.
+
+---
 ## 📁 Estructura del Proyecto
 
 ```
@@ -76,33 +125,77 @@ src/
 
 ---
 
-## 📡 API Endpoints
+## Características y Endpoints
 
-### Autenticación
+A continuación se detallan los módulos principales y sus rutas más importantes.
 
-Permite el registro, inicio de sesión, cierre de sesión, renovación de tokens, recuperación de contraseña y gestión del perfil del usuario autenticado.
+### 🔐 Autenticación
+Base URL: `http://localhost:3002/api/auth`
+- `POST http://localhost:3002/api/auth/register`: Registro de nuevos usuarios.
+- `POST http://localhost:3002/api/auth/login`: Inicia sesión y devuelve tokens (Access & Refresh).
+- `POST http://localhost:3002/api/auth/logout`: Cierra la sesión activa.
+- `POST http://localhost:3002/api/auth/refresh`: Renueva el token de acceso vencido.
+- `GET http://localhost:3002/api/auth/me`: Obtiene información del usuario actual.
+- `GET http://localhost:3002/api/auth/profile`: Ver perfil completo.
+- `PUT http://localhost:3002/api/auth/profile`: Actualizar perfil completo.
+- `POST http://localhost:3002/api/auth/forgot-password`: Solicitar recuperación de contraseña.
+- `POST http://localhost:3002/api/auth/reset-password`: Restablecer contraseña.
 
-### Usuarios
+### 👥 Usuarios
+Base URL: `http://localhost:3002/api/users` (Requiere rol Admin/Supervisor)
+- `GET http://localhost:3002/api/users/`: Listar todos los usuarios.
+- `POST http://localhost:3002/api/users/`: Crear un usuario (modo administrativo).
+- `GET http://localhost:3002/api/users/:id`: Detalles de un usuario específico.
+- `PUT http://localhost:3002/api/users/:id`: Actualizar datos de un usuario.
+- `PATCH http://localhost:3002/api/users/:id/deactivate`: Desactivar usuario.
+- `PATCH http://localhost:3002/api/users/:id/activate`: Activar usuario.
 
-Incluye operaciones administrativas para crear, listar, actualizar, activar o desactivar usuarios, según roles y permisos.
+### 📦 Inventario
+Base URL: `http://localhost:3002/api/inventory`
+- `GET http://localhost:3002/api/inventory/list`: Listar inventario.
+- `POST http://localhost:3002/api/inventory/create`: Agregar items.
+- `GET http://localhost:3002/api/inventory/get/:id`: Ver detalle de item.
+- `PATCH http://localhost:3002/api/inventory/update/:id`: Actualizar stock/datos.
+- `DELETE http://localhost:3002/api/inventory/delete/:id`: Eliminar item.
 
-### Inventario
+### 💰 Ventas
+Base URL: `http://localhost:3002/api/sales`
+- `GET http://localhost:3002/api/sales/list`: Listar ventas realizadas.
+- `POST http://localhost:3002/api/sales/create`: Registrar nueva venta.
+- `GET http://localhost:3002/api/sales/get/:id`: Detalle de una venta.
+- `GET http://localhost:3002/api/sales/get-by-dni/:id`: Buscar ventas por cliente.
+- `PATCH http://localhost:3002/api/sales/update/:id`: Actualizar venta.
+- `DELETE http://localhost:3002/api/sales/delete/:id`: Anular venta.
 
-Gestiona productos, stock y actualización de información relacionada con los artículos del sistema.
+### 🚚 Proveedores
+Base URL: `http://localhost:3002/api/providers`
+- `GET http://localhost:3002/api/providers/list`: Listar proveedores.
+- `POST http://localhost:3002/api/providers/create`: Crear proveedor.
+- `GET http://localhost:3002/api/providers/get/:id`: Ver detalle de proveedor.
+- `PATCH http://localhost:3002/api/providers/update/:id`: Actualizar proveedor.
+- `DELETE http://localhost:3002/api/providers/delete/:id`: Eliminar proveedor.
 
-### Ventas
+### 🛒 Pedidos
+Base URL: `http://localhost:3002/api/orders`
+- `GET http://localhost:3002/api/orders/list`: Listar pedidos.
+- `POST http://localhost:3002/api/orders/create`: Crear pedido.
+- `GET http://localhost:3002/api/orders/get/:id`: Ver detalle de pedido.
+- `PATCH http://localhost:3002/api/orders/update/:id`: Actualizar pedido.
+- `DELETE http://localhost:3002/api/orders/delete/:id`: Cancelar pedido.
 
-Registra, consulta, actualiza y anula ventas, incluyendo búsquedas por cliente.
+### 📱 Códigos QR
+Base URL: `http://localhost:3002/api/qr`
+- `GET http://localhost:3002/api/qr/list`: Listar códigos QR generados.
+- `POST http://localhost:3002/api/qr/create`: Generar nuevo QR.
+- `GET http://localhost:3002/api/qr/get/:id`: Ver detalle de QR.
+- `DELETE http://localhost:3002/api/qr/delete/:id`: Eliminar QR.
 
-### Proveedores y Pedidos
+### 🧊 Objetos
+Base URL: `http://localhost:3002/api/objects`
+- `POST http://localhost:3002/api/objects/create`: Crear objeto.
+- `GET http://localhost:3002/api/objects/get/:id`: Ver objeto.
+- `DELETE http://localhost:3002/api/objects/delete/:id`: Eliminar objeto.
 
-Permite la administración completa de proveedores y pedidos asociados al flujo comercial.
-
-### QR y Objetos
-
-Incluye generación y gestión de códigos QR y objetos personalizados.
-
----
 
 ## 🚀 Inicio Rápido
 
