@@ -18,22 +18,23 @@ const qrRoutes = require("./routes/qrRoutes");
 const ordersRoutes = require("./routes/orders");
 
 const app = express();
+// Trigger restart for env update
 
 app.use(helmet());
 // Allowed origins desde env (coma-separados). Incluye localhost para pruebas.
-const allowedOrigins = (process.env.CORS_ALLOWED_ORIGINS || 'https://techderos.com.co,http://localhost:4173,http://localhost:3000').split(',');
+const allowedOrigins = (process.env.CORS_ALLOWED_ORIGINS || process.env.ALLOWED_ORIGINS || 'https://techderos.com.co,http://localhost:4173,http://localhost:3000,http://localhost:3001,http://localhost:3002,http://192.168.2.82:3001').split(',');
 app.use(
-   cors({
-     origin: (origin, callback) => {
-       // permitir requests sin origin (curl, mobile, servidor)
-       if (!origin) return callback(null, true);
-       return allowedOrigins.includes(origin) ? callback(null, true) : callback(new Error('CORS not allowed'));
-     },
-     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
-     credentials: true,
-   })
-   );
+  cors({
+    origin: (origin, callback) => {
+      // permitir requests sin origin (curl, mobile, servidor)
+      if (!origin) return callback(null, true);
+      return allowedOrigins.includes(origin) ? callback(null, true) : callback(new Error('CORS not allowed'));
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+    credentials: true,
+  })
+);
 // Responder correctamente a preflight OPTIONS
 app.options('*', cors());
 
