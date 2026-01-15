@@ -8,11 +8,12 @@
  * - deactivateUser: Desactivación con cleanup de datos
  */
 
-const User = require('../models/User');
-const Role = require('../models/Role');
-const authService = require('./authService');
-const emailService = require('./emailService');
-const logger = require('../utils/logger');
+const User = require("../models/User");
+const db = require("../config/database");
+const Role = require("../models/Role");
+const authService = require("./authService");
+const emailService = require("./emailService");
+const logger = require("../utils/logger");
 
 class UserService {
   /**
@@ -22,14 +23,14 @@ class UserService {
     try {
       const user = await User.findById(userId);
       if (!user) {
-        const error = new Error('Usuario no encontrado');
+        const error = new Error("Usuario no encontrado");
         error.statusCode = 404;
         throw error;
       }
-      
+
       return user.toJSON();
     } catch (error) {
-      logger.error('Error obteniendo usuario por ID:', error);
+      logger.error("Error obteniendo usuario por ID:", error);
       throw error;
     }
   }
@@ -42,7 +43,7 @@ class UserService {
       const user = await User.findByEmail(email);
       return user ? user.toJSON() : null;
     } catch (error) {
-      logger.error('Error obteniendo usuario por email:', error);
+      logger.error("Error obteniendo usuario por email:", error);
       throw error;
     }
   }
@@ -55,38 +56,43 @@ class UserService {
       // Verificar si el email ya existe
       const existingUser = await User.findByEmail(userData.email);
       if (existingUser) {
-        const error = new Error('Ya existe un usuario con este email');
+        const error = new Error("Ya existe un usuario con este email");
         error.statusCode = 400;
         throw error;
       }
 
       // Crear el usuario
+
+      console.log("USER ROL ID -->");
+      console.log(userData.rol);
+
       const user = new User({
         name: userData.name,
         email: userData.email,
         password: userData.password,
-        rol: userData.rol || 'usuario',
+        rol: userData.rol || "usuario",
         isActive: userData.isActive !== undefined ? userData.isActive : true,
-        emailVerified: userData.emailVerified !== undefined ? userData.emailVerified : false,
+        emailVerified:
+          userData.emailVerified !== undefined ? userData.emailVerified : false,
         created_at: new Date(),
-        updated_at: new Date()
+        updated_at: new Date(),
       });
 
       // Hash de la contraseña
       await user.hashPassword(userData.password);
-      
+
       // Guardar en la base de datos
       await user.save();
 
-      logger.info('Usuario creado exitosamente', { 
-        userId: user.id, 
+      logger.info("Usuario creado exitosamente", {
+        userId: user.id,
         email: userData.email,
-        rol: userData.rol 
+        rol: userData.rol,
       });
 
       return user.toJSON();
     } catch (error) {
-      logger.error('Error creando usuario:', error);
+      logger.error("Error creando usuario:", error);
       throw error;
     }
   }
@@ -96,31 +102,46 @@ class UserService {
    */
   async updateUser(userId, updateData) {
     try {
+      console.log("dkskdjskdskjdksjdksj")
       const user = await User.findById(userId);
       if (!user) {
-        const error = new Error('Usuario no encontrado');
+        const error = new Error("Usuario no encontrado");
         error.statusCode = 404;
         throw error;
       }
 
       // Validaciones de negocio
       await this.validateUserUpdate(user, updateData);
+      console.log("ACA ESTA EL ERRRRRORORO")
+
 
       // Aplicar actualizaciones
-      Object.keys(updateData).forEach(key => {
-        if (updateData[key] !== undefined && key !== 'id' && key !== 'password') {
+      Object.keys(updateData).forEach((key) => {
+        if (
+          updateData[key] !== undefined &&
+          key !== "id" &&
+          key !== "password"
+        ) {
           user[key] = updateData[key];
         }
       });
 
       user.updated_at = new Date();
+
+      if (updateData.password) {
+        await user.hashPassword(updateData.password);
+      }
+
       await user.save();
 
-      logger.info('Usuario actualizado', { userId, updateData: Object.keys(updateData) });
-      
+      logger.info("Usuario actualizado", {
+        userId,
+        updateData: Object.keys(updateData),
+      });
+
       return user.toJSON();
     } catch (error) {
-      logger.error('Error actualizando usuario:', error);
+      logger.error("Error actualizando usuario:", error);
       throw error;
     }
   }
@@ -132,15 +153,17 @@ class UserService {
     try {
       const user = await User.findById(userId);
       if (!user) {
-        const error = new Error('Usuario no encontrado');
+        const error = new Error("Usuario no encontrado");
         error.statusCode = 404;
         throw error;
       }
 
       // Verificar contraseña actual
-      const isCurrentPasswordValid = await user.comparePassword(currentPassword);
+      const isCurrentPasswordValid = await user.comparePassword(
+        currentPassword
+      );
       if (!isCurrentPasswordValid) {
-        const error = new Error('Contraseña actual incorrecta');
+        const error = new Error("Contraseña actual incorrecta");
         error.statusCode = 400;
         throw error;
       }
@@ -148,7 +171,9 @@ class UserService {
       // Verificar que la nueva contraseña sea diferente
       const isSamePassword = await user.comparePassword(newPassword);
       if (isSamePassword) {
-        const error = new Error('La nueva contraseña debe ser diferente a la actual');
+        const error = new Error(
+          "La nueva contraseña debe ser diferente a la actual"
+        );
         error.statusCode = 400;
         throw error;
       }
@@ -159,18 +184,21 @@ class UserService {
       await user.save();
 
       // Revocar todos los tokens por seguridad
-      await authService.revokeAllUserTokens(userId);
+      await user.revokeAllRefreshTokens();
 
       // Enviar notificación de seguridad
       try {
-        await emailService.sendSecurityAlert(user.email, 'Contraseña cambiada desde el perfil');
+        await emailService.sendSecurityAlert(
+          user.email,
+          "Contraseña cambiada desde el perfil"
+        );
       } catch (emailError) {
-        logger.warn('Error enviando alerta de seguridad:', emailError);
+        logger.warn("Error enviando alerta de seguridad:", emailError);
       }
 
-      logger.info('Contraseña cambiada exitosamente', { userId });
+      logger.info("Contraseña cambiada exitosamente", { userId });
     } catch (error) {
-      logger.error('Error cambiando contraseña:', error);
+      logger.error("Error cambiando contraseña:", error);
       throw error;
     }
   }
@@ -181,15 +209,15 @@ class UserService {
   async getUsers(filters = {}) {
     try {
       const result = await User.getUsers(filters);
-      
-      logger.info('Usuarios obtenidos con filtros', { 
-        filters, 
-        total: result.pagination.total 
+
+      logger.info("Usuarios obtenidos con filtros", {
+        filters,
+        total: result.pagination.total,
       });
-      
+
       return result;
     } catch (error) {
-      logger.error('Error obteniendo usuarios:', error);
+      logger.error("Error obteniendo usuarios:", error);
       throw error;
     }
   }
@@ -201,35 +229,41 @@ class UserService {
     try {
       const user = await User.findById(userId);
       if (!user) {
-        const error = new Error('Usuario no encontrado');
+        const error = new Error("Usuario no encontrado");
         error.statusCode = 404;
         throw error;
       }
 
-      if (user.status === 'inactive') {
-        const error = new Error('El usuario ya está inactivo');
+      if (user.status === "inactive") {
+        const error = new Error("El usuario ya está inactivo");
         error.statusCode = 400;
         throw error;
       }
 
       // Actualizar estado
-      user.status = 'inactive';
+      user.status = "inactive";
       user.updated_at = new Date();
       await user.save();
 
       // Revocar todos los tokens del usuario
-      await authService.revokeAllUserTokens(userId);
+      await user.revokeAllRefreshTokens();
 
       // Enviar notificación
       try {
-        await emailService.sendAccountLockNotification(user.email, 'Cuenta desactivada por administrador');
+        await emailService.sendAccountLockNotification(
+          user.email,
+          "Cuenta desactivada por administrador"
+        );
       } catch (emailError) {
-        logger.warn('Error enviando notificación de desactivación:', emailError);
+        logger.warn(
+          "Error enviando notificación de desactivación:",
+          emailError
+        );
       }
 
-      logger.info('Usuario desactivado', { userId });
+      logger.info("Usuario desactivado", { userId });
     } catch (error) {
-      logger.error('Error desactivando usuario:', error);
+      logger.error("Error desactivando usuario:", error);
       throw error;
     }
   }
@@ -241,45 +275,79 @@ class UserService {
     try {
       const user = await User.findById(userId);
       if (!user) {
-        const error = new Error('Usuario no encontrado');
+        const error = new Error("Usuario no encontrado");
         error.statusCode = 404;
         throw error;
       }
 
-      if (user.status === 'active') {
-        const error = new Error('El usuario ya está activo');
+      if (user.status === "active") {
+        const error = new Error("El usuario ya está activo");
         error.statusCode = 400;
         throw error;
       }
 
       // Actualizar estado
-      user.status = 'active';
+      user.status = "active";
       user.updated_at = new Date();
-      
+
       // Reset intentos fallidos si existían
       user.failed_login_attempts = 0;
       user.locked_until = null;
-      
+
       await user.save();
 
       // Enviar notificación
       try {
-        await emailService.sendSecurityAlert(user.email, 'Cuenta reactivada por administrador');
+        await emailService.sendSecurityAlert(
+          user.email,
+          "Cuenta reactivada por administrador"
+        );
       } catch (emailError) {
-        logger.warn('Error enviando notificación de activación:', emailError);
+        logger.warn("Error enviando notificación de activación:", emailError);
       }
 
-      logger.info('Usuario activado', { userId });
+      logger.info("Usuario activado", { userId });
     } catch (error) {
-      logger.error('Error activando usuario:', error);
+      logger.error("Error activando usuario:", error);
+      throw error;
+    }
+  }
+  /**
+   * Eliminar usuario (soft delete)
+   */
+  async deleteUser(userId) {
+    try {
+      // Verificar existencia
+      const user = await User.findById(userId);
+      if (!user) {
+        const error = new Error("Usuario no encontrado");
+        error.statusCode = 404;
+        throw error;
+      }
+      // Hard delete: eliminar registro de la base de datos
+      const query = "DELETE FROM users WHERE id = ?";
+      await db.query(query, [userId]);
+      // Revocar todos los tokens del usuario
+      await user.revokeAllRefreshTokens();
+      logger.info("Usuario eliminado", { userId });
+      return;
+    } catch (error) {
+      logger.error("Error eliminando usuario:", error);
       throw error;
     }
   }
 
   /**
-   * Obtener estadísticas de usuarios
-   */
-  async getUserStats() {
+      // Eliminar registro físicamente de la tabla
+      // Revocar todos los tokens del usuario antes de borrar
+      await user.revokeAllRefreshTokens();
+      const deleteQuery = 'DELETE FROM "user" WHERE id = $1';
+      const result = await db.query(deleteQuery, [userId]);
+      if (result.rowCount === 0) {
+        const error = new Error('Usuario no encontrado');
+        error.statusCode = 404;
+        throw error;
+      }
     try {
       const stats = await User.getStats();
       
@@ -315,19 +383,19 @@ class UserService {
     try {
       const searchFilters = {
         ...filters,
-        search: searchTerm
+        search: searchTerm,
       };
 
       const result = await User.getUsers(searchFilters);
-      
-      logger.info('Búsqueda de usuarios realizada', { 
-        searchTerm, 
-        results: result.pagination.total 
+
+      logger.info("Búsqueda de usuarios realizada", {
+        searchTerm,
+        results: result.pagination.total,
       });
-      
+
       return result;
     } catch (error) {
-      logger.error('Error buscando usuarios:', error);
+      logger.error("Error buscando usuarios:", error);
       throw error;
     }
   }
@@ -339,19 +407,19 @@ class UserService {
     try {
       const roleFilters = {
         ...filters,
-        rol: roleName
+        rol: roleName,
       };
 
       const result = await User.getUsers(roleFilters);
-      
-      logger.info('Usuarios obtenidos por rol', { 
-        rol: roleName, 
-        total: result.pagination.total 
+
+      logger.info("Usuarios obtenidos por rol", {
+        rol: roleName,
+        total: result.pagination.total,
       });
-      
+
       return result;
     } catch (error) {
-      logger.error('Error obteniendo usuarios por rol:', error);
+      logger.error("Error obteniendo usuarios por rol:", error);
       throw error;
     }
   }
@@ -364,31 +432,23 @@ class UserService {
     if (updateData.email && updateData.email !== user.email) {
       const existingUser = await User.findByEmail(updateData.email);
       if (existingUser && existingUser.id !== user.id) {
-        const error = new Error('El email ya está en uso por otro usuario');
+        const error = new Error("El email ya está en uso por otro usuario");
         error.statusCode = 409;
         throw error;
       }
-      
+
       // Si se cambia el email, marcar como no verificado
       updateData.email_verified = false;
-      updateData.email_verification_token = require('crypto').randomBytes(32).toString('hex');
-    }
-
-    // Validar cambio de rol
-    if (updateData.rol && updateData.rol !== user.rol) {
-      const role = await Role.findByName(updateData.rol);
-      if (!role) {
-        const error = new Error('Rol especificado no válido');
-        error.statusCode = 400;
-        throw error;
-      }
+      updateData.email_verification_token = require("crypto")
+        .randomBytes(32)
+        .toString("hex");
     }
 
     // Validar cambio de estado
     if (updateData.status) {
-      const validStatuses = ['pending', 'active', 'inactive', 'suspended'];
+      const validStatuses = ["pending", "active", "inactive", "suspended"];
       if (!validStatuses.includes(updateData.status)) {
-        const error = new Error('Estado especificado no válido');
+        const error = new Error("Estado especificado no válido");
         error.statusCode = 400;
         throw error;
       }
@@ -400,8 +460,10 @@ class UserService {
    */
   async cleanupInactiveUsers(daysInactive = 365) {
     try {
-      const cutoffDate = new Date(Date.now() - daysInactive * 24 * 60 * 60 * 1000);
-      
+      const cutoffDate = new Date(
+        Date.now() - daysInactive * 24 * 60 * 60 * 1000
+      );
+
       const query = `
         UPDATE users 
         SET 
@@ -415,15 +477,17 @@ class UserService {
           AND email NOT LIKE 'deleted_%'
         RETURNING id
       `;
-      
-      const db = require('../config/database');
+
+      const db = require("../config/database");
       const result = await db.query(query, [cutoffDate]);
-      
-      logger.info(`Limpieza de usuarios inactivos: ${result.rowCount} usuarios anonimizados`);
-      
+
+      logger.info(
+        `Limpieza de usuarios inactivos: ${result.rowCount} usuarios anonimizados`
+      );
+
       return result.rowCount;
     } catch (error) {
-      logger.error('Error limpiando usuarios inactivos:', error);
+      logger.error("Error limpiando usuarios inactivos:", error);
       throw error;
     }
   }
@@ -443,13 +507,13 @@ class UserService {
         GROUP BY DATE_TRUNC('day', created_at)
         ORDER BY date DESC
       `;
-      
-      const db = require('../config/database');
+
+      const db = require("../config/database");
       const result = await db.query(query);
-      
+
       return result.rows;
     } catch (error) {
-      logger.error('Error obteniendo actividad reciente:', error);
+      logger.error("Error obteniendo actividad reciente:", error);
       throw error;
     }
   }

@@ -32,7 +32,7 @@ const DEFAULT_ENV_VARS = {
   // JWT
   JWT_SECRET: null, // Se genera automáticamente si no existe
   JWT_REFRESH_SECRET: null,
-  JWT_ACCESS_EXPIRY: '15m',
+  JWT_ACCESS_EXPIRY: '7d',
   JWT_REFRESH_EXPIRY: '7d',
   JWT_ISSUER: 'usuarios-service',
   JWT_AUDIENCE: 'gestion-comercial',

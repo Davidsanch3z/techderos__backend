@@ -8,10 +8,10 @@
  * - Relaciones con tabla roles existente
  */
 
-const bcrypt = require('bcrypt');
-const { v4: uuidv4 } = require('uuid');
-const db = require('../config/database');
-const logger = require('../utils/logger');
+const bcrypt = require("bcrypt");
+const { v4: uuidv4 } = require("uuid");
+const db = require("../config/database");
+const logger = require("../utils/logger");
 
 class User {
   constructor(userData) {
@@ -24,12 +24,11 @@ class User {
     this.isActive = userData.isActive !== undefined ? userData.isActive : true;
     this.createdAt = userData.createdAt || new Date();
     this.updatedAt = userData.updatedAt || new Date();
-    this.deletedAt = userData.deletedAt || null;
     this.empresaId = userData.empresaId || null;
-    
+
     // Propiedades virtuales para compatibilidad con authService
     this.email_verified = userData.isActive || false; // Mapear isActive a email_verified
-    this.status = userData.isActive ? 'active' : 'pending';
+    this.status = userData.isActive ? "active" : "pending";
     this.rol = this.mapIdToRole(this.roleId);
     this.last_login = userData.last_login;
     this.failed_login_attempts = userData.failed_login_attempts || 0;
@@ -41,16 +40,16 @@ class User {
    */
   mapRoleToId(rol) {
     const roleMap = {
-      'administrador': 'admin',
-      'tendero': 'user',
-      'supervisor': 'manager',
-      'admin': 'admin',
-      'user': 'user',
-      'usuario': 'user',
-      'moderador': 'manager',
-      'manager': 'manager'
+      administrador: "admin",
+      tendero: "user",
+      supervisor: "manager",
+      admin: "admin",
+      user: "user",
+      usuario: "user",
+      moderador: "manager",
+      manager: "manager",
     };
-    return roleMap[rol] || 'user';
+    return roleMap[rol] || "user";
   }
 
   /**
@@ -58,11 +57,11 @@ class User {
    */
   mapIdToRole(roleId) {
     const idMap = {
-      'admin': 'administrador',
-      'user': 'usuario',
-      'manager': 'moderador'
+      admin: "administrador",
+      user: "usuario",
+      manager: "moderador",
     };
-    return idMap[roleId] || 'usuario';
+    return idMap[roleId] || "usuario";
   }
 
   /**
@@ -94,7 +93,7 @@ class User {
       email_verified: this.email_verified,
       status: this.status,
       createdAt: this.createdAt,
-      updatedAt: this.updatedAt
+      updatedAt: this.updatedAt,
     };
   }
 
@@ -104,53 +103,68 @@ class User {
   async save() {
     try {
       this.updatedAt = new Date();
-      
+
       // Verificar si el usuario ya existe
       const existingUser = await User.findById(this.id);
-      
+
       if (existingUser) {
         // Actualizar usuario existente
+        console.log("UPDATEEEEEEEEEEE");
         const query = `
-          UPDATE "user" 
-          SET email = $1, password = $2, name = $3, "roleId" = $4, 
-              "isActive" = $5, "updatedAt" = $6, "empresaId" = $7
-          WHERE id = $8
-          RETURNING *
+          UPDATE users 
+          SET email = ?, password = ?, name = ?, roleId = ?, 
+              isActive = ?, updatedAt = ?, empresaId = ?
+          WHERE id = ?
         `;
+
         const values = [
-          this.email, this.password, this.name, this.roleId,
-          this.isActive, this.updatedAt, this.empresaId, this.id
+          this.email,
+          this.password,
+          this.name,
+          this.roleId,
+          this.isActive,
+          this.updatedAt,
+          this.empresaId,
+          this.id,
         ];
-        
-        const result = await db.query(query, values);
-        
-        if (result.rows.length > 0) {
-          Object.assign(this, result.rows[0]);
-          return this;
+
+        await db.query(query, values);
+        const user = await User.findById(this.id);
+
+        if (user) {
+          return Object.assign(this, user);
         }
       } else {
-        // Crear nuevo usuario
+        console.log("CREATINGGG");
         const query = `
-          INSERT INTO "user" (id, email, password, name, "roleId", "isActive", "createdAt", "updatedAt", "empresaId")
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-          RETURNING *
+          INSERT INTO users (id, email, password, name, roleId, createdAt, updatedAt, empresaId)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?);
         `;
         const values = [
-          this.id, this.email, this.password, this.name, this.roleId,
-          this.isActive, this.createdAt, this.updatedAt, this.empresaId
+          this.id,
+          this.email,
+          this.password,
+          this.name,
+          this.roleId,
+          this.createdAt,
+          this.updatedAt,
+          this.empresaId,
         ];
-        
+
         const result = await db.query(query, values);
-        
-        if (result.rows.length > 0) {
-          Object.assign(this, result.rows[0]);
+        const check_user = await db.query(
+          "SELECT * FROM users WHERE email = $1",
+          [this.email]
+        );
+        if (check_user.rows.length > 0) {
+          Object.assign(this, check_user.rows[0]);
           return this;
         }
       }
-      
-      throw new Error('No se pudo guardar el usuario');
+
+      throw new Error("No se pudo guardar el usuarioXXXXX");
     } catch (error) {
-      logger.error('Error guardando usuario:', error);
+      logger.error("Error guardando usuario:", error);
       throw error;
     }
   }
@@ -160,16 +174,16 @@ class User {
    */
   static async findByEmail(email) {
     try {
-      const query = 'SELECT * FROM "user" WHERE email = $1 AND "deletedAt" IS NULL';
+      const query = "SELECT * FROM users WHERE email = $1;";
       const result = await db.query(query, [email]);
-      
+
       if (result.rows.length === 0) {
         return null;
       }
-      
+
       return new User(result.rows[0]);
     } catch (error) {
-      logger.error('Error buscando usuario por email:', error);
+      logger.error("Error buscando usuario por email:", error);
       throw error;
     }
   }
@@ -179,16 +193,16 @@ class User {
    */
   static async findById(id) {
     try {
-      const query = 'SELECT * FROM "user" WHERE id = $1 AND "deletedAt" IS NULL';
+      const query = "SELECT * FROM users WHERE id = $1;";
       const result = await db.query(query, [id]);
-      
+
       if (result.rows.length === 0) {
         return null;
       }
-      
+
       return new User(result.rows[0]);
     } catch (error) {
-      logger.error('Error buscando usuario por ID:', error);
+      logger.error("Error buscando usuario por ID:", error);
       throw error;
     }
   }
@@ -198,55 +212,54 @@ class User {
    */
   static async getUsers(filters = {}) {
     try {
-      const {
-        page = 1,
-        limit = 10,
-        rol,
-        status,
-        search
-      } = filters;
+      const { page = 1, limit = 10, rol, status, search } = filters;
 
-      let query = 'SELECT * FROM "user" WHERE "deletedAt" IS NULL';
+      let query = "SELECT * FROM users WHERE 1=1";
       const params = [];
       let paramCount = 0;
 
       // Filtro por búsqueda (nombre o email)
       if (search) {
-        paramCount++;
-        query += ` AND (name ILIKE $${paramCount} OR email ILIKE $${paramCount})`;
-        params.push(`%${search}%`);
+        query += ` AND (name LIKE ? OR email LIKE ?)`;
+        params.push(`%${search}%`, `%${search}%`);
       }
 
       // Filtro por rol
       if (rol) {
-        paramCount++;
-        query += ` AND "roleId" = $${paramCount}`;
+        query += ` AND roleId = ?`;
         params.push(rol);
       }
 
       // Filtro por estado
       if (status) {
         paramCount++;
-        const isActive = status === 'active';
-        query += ` AND "isActive" = $${paramCount}`;
+        const isActive = status === "active";
+        query += ` AND isActive = ?`;
         params.push(isActive);
       }
 
       // Contar total de registros
-      const countQuery = query.replace('SELECT *', 'SELECT COUNT(*)');
+      const countQuery = query.replace("SELECT *", "SELECT COUNT(*) as count");
+
       const countResult = await db.query(countQuery, params);
       const totalUsers = parseInt(countResult.rows[0].count);
 
       // Agregar paginación
       const offset = (page - 1) * limit;
-      query += ` ORDER BY "createdAt" DESC LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
+      query += ` ORDER BY createdAt DESC LIMIT $${paramCount + 1} OFFSET $${
+        paramCount + 2
+      }`;
       params.push(limit, offset);
 
       // Ejecutar consulta principal
+      console.log("QUERY");
+      console.log(query);
+      console.log("PARAMS");
+      console.log(params);
       const result = await db.query(query, params);
-      
+
       // Convertir resultados a instancias de User
-      const users = result.rows.map(row => new User(row).toJSON());
+      const users = result.rows.map((row) => new User(row).toJSON());
 
       return {
         users,
@@ -254,11 +267,11 @@ class User {
           currentPage: page,
           totalPages: Math.ceil(totalUsers / limit),
           totalUsers,
-          limit
-        }
+          limit,
+        },
       };
     } catch (error) {
-      logger.error('Error obteniendo usuarios:', error);
+      logger.error("Error obteniendo usuarios:", error);
       throw error;
     }
   }
@@ -273,7 +286,9 @@ class User {
    */
   static async findByEmailVerificationToken(token) {
     // La tabla actual no tiene este campo, retornamos null
-    logger.warn('findByEmailVerificationToken llamado pero no soportado por la tabla actual');
+    logger.warn(
+      "findByEmailVerificationToken llamado pero no soportado por la tabla actual"
+    );
     return null;
   }
 
@@ -282,7 +297,9 @@ class User {
    */
   static async findByPasswordResetToken(token) {
     // La tabla actual no tiene este campo, retornamos null
-    logger.warn('findByPasswordResetToken llamado pero no soportado por la tabla actual');
+    logger.warn(
+      "findByPasswordResetToken llamado pero no soportado por la tabla actual"
+    );
     return null;
   }
 
@@ -310,7 +327,9 @@ class User {
    */
   async setEmailVerificationToken(token) {
     // La tabla actual no soporta este campo
-    logger.warn('setEmailVerificationToken llamado pero no soportado por la tabla actual');
+    logger.warn(
+      "setEmailVerificationToken llamado pero no soportado por la tabla actual"
+    );
   }
 
   /**
@@ -318,7 +337,9 @@ class User {
    */
   async setPasswordResetToken(token, expires) {
     // La tabla actual no soporta estos campos
-    logger.warn('setPasswordResetToken llamado pero no soportado por la tabla actual');
+    logger.warn(
+      "setPasswordResetToken llamado pero no soportado por la tabla actual"
+    );
   }
 
   /**
@@ -326,7 +347,9 @@ class User {
    */
   async clearPasswordResetToken() {
     // La tabla actual no soporta estos campos
-    logger.warn('clearPasswordResetToken llamado pero no soportado por la tabla actual');
+    logger.warn(
+      "clearPasswordResetToken llamado pero no soportado por la tabla actual"
+    );
   }
 
   /**
@@ -375,14 +398,16 @@ class User {
    */
   async incrementFailedAttempts() {
     this.failed_login_attempts = (this.failed_login_attempts || 0) + 1;
-    
+
     // Bloquear cuenta después de 5 intentos fallidos
     if (this.failed_login_attempts >= 5) {
       this.locked_until = new Date(Date.now() + 30 * 60 * 1000); // 30 minutos
     }
-    
+
     // Nota: No guardamos en DB porque la tabla actual no tiene estos campos
-    logger.warn(`Intentos fallidos: ${this.failed_login_attempts} para usuario ${this.id}`);
+    logger.warn(
+      `Intentos fallidos: ${this.failed_login_attempts} para usuario ${this.id}`
+    );
   }
 
   /**
@@ -392,7 +417,7 @@ class User {
     this.failed_login_attempts = 0;
     this.locked_until = null;
     this.last_login = new Date();
-    
+
     // Nota: No guardamos en DB porque la tabla actual no tiene estos campos
     logger.info(`Intentos fallidos reseteados para usuario ${this.id}`);
   }

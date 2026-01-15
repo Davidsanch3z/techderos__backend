@@ -1,17 +1,5 @@
-/**
- * Modelo Role adaptado para la tabla existente
- * Estructura de la tabla roles:
- * - id: text
- * - name: text
- * - description: text
- * - permissions: ARRAY
- * - createdAt: timestamp
- * - updatedAt: timestamp  
- * - deletedAt: timestamp
- */
-
-const db = require('../config/database');
-const logger = require('../utils/logger');
+const db = require("../config/database");
+const logger = require("../utils/logger");
 
 class Role {
   constructor(roleData = {}) {
@@ -28,7 +16,9 @@ class Role {
    * Verificar si el rol tiene un permiso específico
    */
   hasPermission(permission) {
-    return this.permissions.includes('ALL') || this.permissions.includes(permission);
+    return (
+      this.permissions.includes("ALL") || this.permissions.includes(permission)
+    );
   }
 
   /**
@@ -36,9 +26,9 @@ class Role {
    */
   getHierarchyLevel() {
     const hierarchies = {
-      'admin': 100,
-      'Manager': 80,
-      'Usuario': 50
+      admin: 100,
+      Manager: 80,
+      Usuario: 50,
     };
     return hierarchies[this.name] || 0;
   }
@@ -59,23 +49,18 @@ class Role {
         RETURNING *
       `;
 
-      const values = [
-        this.id,
-        this.name,
-        this.description,
-        this.permissions
-      ];
+      const values = [this.id, this.name, this.description, this.permissions];
 
       const result = await db.query(query, values);
-      
+
       if (result.rows.length > 0) {
         Object.assign(this, result.rows[0]);
         logger.info(`Rol guardado: ${this.name}`);
       }
-      
+
       return this;
     } catch (error) {
-      logger.error('Error guardando rol:', error);
+      logger.error("Error guardando rol:", error);
       throw error;
     }
   }
@@ -85,16 +70,17 @@ class Role {
    */
   static async findByName(name) {
     try {
-      const query = 'SELECT * FROM roles WHERE name = $1 AND "deletedAt" IS NULL';
+      const query =
+        'SELECT * FROM roles WHERE name = $1 AND "deletedAt" IS NULL';
       const result = await db.query(query, [name]);
-      
+
       if (result.rows.length === 0) {
         return null;
       }
-      
+
       return new Role(result.rows[0]);
     } catch (error) {
-      logger.error('Error buscando rol por nombre:', error);
+      logger.error("Error buscando rol por nombre:", error);
       throw error;
     }
   }
@@ -106,14 +92,14 @@ class Role {
     try {
       const query = 'SELECT * FROM roles WHERE id = $1 AND "deletedAt" IS NULL';
       const result = await db.query(query, [id]);
-      
+
       if (result.rows.length === 0) {
         return null;
       }
-      
+
       return new Role(result.rows[0]);
     } catch (error) {
-      logger.error('Error buscando rol por ID:', error);
+      logger.error("Error buscando rol por ID:", error);
       throw error;
     }
   }
@@ -123,34 +109,13 @@ class Role {
    */
   static async findAll() {
     try {
-      const query = 'SELECT * FROM roles WHERE "deletedAt" IS NULL ORDER BY name';
+      const query =
+        'SELECT * FROM roles WHERE "deletedAt" IS NULL ORDER BY name';
       const result = await db.query(query);
-      
-      return result.rows.map(row => new Role(row));
-    } catch (error) {
-      logger.error('Error obteniendo todos los roles:', error);
-      throw error;
-    }
-  }
 
-  /**
-   * Los roles ya existen en la base de datos, así que no necesitamos crearlos
-   * Solo validamos que existan los roles básicos
-   */
-  static async initializeDefaultRoles() {
-    try {
-      logger.info('Verificando roles existentes...');
-      
-      const roles = await Role.findAll();
-      logger.info(`Se encontraron ${roles.length} roles en la base de datos:`);
-      
-      roles.forEach(role => {
-        logger.info(`- ${role.name} (${role.id}): ${role.description}`);
-      });
-      
-      return true;
+      return result.rows.map((row) => new Role(row));
     } catch (error) {
-      logger.error('Error verificando roles:', error);
+      logger.error("Error obteniendo todos los roles:", error);
       throw error;
     }
   }
