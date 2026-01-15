@@ -306,4 +306,4 @@ Este proyecto se distribuye bajo la licencia MIT.
 **Desarrollado con ❤️ para sistemas de gestión comercial – Techderos**
 
 
-Solo dime.
+JHONATA DAVID SANCHEZ BALDOVINO/ jhonatan.sancheznick@gmil.com
