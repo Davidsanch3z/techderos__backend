@@ -1,360 +1,288 @@
-# Gestión Comercial - Microservicio de Usuarios
+🚀 Gestión Comercial – Microservicio de Usuarios (Techderos Backend)
 
-## 🚀 Descripción
+Backend robusto y escalable para gestión comercial, autenticación y administración de usuarios.
+Este microservicio hace parte del ecosistema Techderos, integrando usuarios, roles, inventario, ventas y lógica core, preparado para desarrollo local y producción.
 
-Microservicio completo para gestión de usuarios desarrollado con Node.js, Express y PostgreSQL. Implementa autenticación JWT, roles y permisos, auditoría completa y está completamente dockerizado para desarrollo y producción.
+📋 Tabla de Contenidos
 
-## 📋 Características
+Descripción General
 
-### 🔐 Autenticación y Autorización
-- **JWT Tokens**: Access tokens de corta duración + Refresh tokens seguros
-- **Roles y Permisos**: Sistema granular de permisos basado en roles
-- **Protección Brute Force**: Bloqueo automático tras intentos fallidos
-- **Verificación de Email**: Proceso completo de verificación
-- **Reset de Contraseña**: Sistema seguro de recuperación
+Características Principales
 
-### 🛡️ Seguridad
-- **Bcrypt**: Hash de contraseñas con salt rounds configurables
-- **Rate Limiting**: Protección contra ataques de fuerza bruta
-- **CORS**: Configuración segura de dominios permitidos
-- **Helmet**: Headers de seguridad automáticos
-- **Validación**: Esquemas Joi para validación de entrada
-- **Sanitización**: Limpieza automática de datos de entrada
+Tecnologías Usadas
 
-### 📊 Auditoría y Monitoreo
-- **Auditoría Completa**: Registro de todas las acciones del sistema
-- **Logging Estructurado**: Winston con diferentes niveles y formatos
-- **Métricas**: Health checks y endpoints de estado
-- **Trazabilidad**: Tracking completo de cambios de usuarios
+Estructura del Proyecto
 
-### 🐳 Infraestructura
-- **Docker**: Contenerización completa con multi-stage builds
-- **Docker Compose**: Orquestación de servicios (app, DB, cache)
-- **PostgreSQL**: Base de datos relacional con migraciones
-- **Redis**: Cache y gestión de sesiones
-- **Health Checks**: Verificación automática de servicios
+API Endpoints
 
-## 🛠️ Tecnologías
+Inicio Rápido
 
-### Backend
-- **Node.js** 18+ con **Express.js**
-- **PostgreSQL** 15 con pool de conexiones
-- **Redis** 7 para cache y sesiones
-- **JWT** para autenticación stateless
-- **Bcrypt** para hash de contraseñas
+Configuración
 
-### Herramientas de Desarrollo
-- **Nodemon** para desarrollo con hot reload
-- **ESLint** con configuración estándar
-- **Prettier** para formateo de código
-- **Jest** para testing unitario e integración
-- **Husky** para git hooks
+Usuarios de Prueba
 
-### Infraestructura
-- **Docker** y **Docker Compose**
-- **Nginx** (configuración incluida)
-- **PM2** para gestión de procesos en producción
+Testing
 
-## 📁 Estructura del Proyecto
+Despliegue
 
-```
-usuarios-service/
-├── src/                          # Código fuente
-│   ├── controllers/              # Controladores REST
-│   │   ├── authController.js     # Autenticación
-│   │   └── userController.js     # Gestión de usuarios
-│   ├── models/                   # Modelos de datos
-│   │   ├── User.js              # Modelo de usuario
-│   │   └── Role.js              # Modelo de roles
-│   ├── routes/                   # Definición de rutas
-│   │   ├── auth.js              # Rutas de autenticación
-│   │   └── users.js             # Rutas de usuarios
-│   ├── middleware/               # Middleware personalizado
-│   │   ├── auth.js              # Verificación JWT
-│   │   ├── validation.js        # Validación Joi
-│   │   └── rateLimiter.js       # Rate limiting
-│   ├── services/                 # Lógica de negocio
-│   │   ├── authService.js       # Servicios de auth
-│   │   ├── userService.js       # Servicios de usuario
-│   │   └── emailService.js      # Servicios de email
-│   ├── config/                   # Configuración
-│   │   ├── database.js          # Pool PostgreSQL
-│   │   ├── jwt.js               # Configuración JWT
-│   │   └── environment.js       # Variables de entorno
-│   ├── utils/                    # Utilidades
-│   │   ├── logger.js            # Winston logger
-│   │   ├── validators.js        # Validadores custom
-│   │   └── helpers.js           # Funciones auxiliares
-│   └── app.js                    # Aplicación principal
-├── sql/                          # Scripts de base de datos
-│   ├── init.sql                 # Estructura inicial
-│   └── seed.sql                 # Datos de prueba
-├── tests/                        # Tests automatizados
-├── docs/                         # Documentación
-├── logs/                         # Archivos de log
-├── data/                         # Datos persistentes
-│   ├── postgres/                # Datos PostgreSQL
-│   └── redis/                   # Datos Redis
-├── docker-compose.yml           # Orquestación de servicios
-├── Dockerfile                   # Imagen del microservicio
-├── package.json                 # Dependencias y scripts
-├── .env.example                 # Variables de entorno ejemplo
-└── README.md                    # Esta documentación
-```
+Seguridad
 
-## 🚀 Inicio Rápido
+Contribución
 
-### 1. Clonar y Configurar
+📌 Descripción General
 
-```bash
-# Clonar el repositorio
-git clone <repository-url>
-cd usuarios-service
+Microservicio backend desarrollado con Node.js y Express, encargado de:
 
-# Copiar configuración de entorno
-cp .env.example .env
+Autenticación y autorización con JWT
 
-# Editar variables de entorno
-# Cambiar JWT_SECRET, DB_PASSWORD, etc.
-```
+Gestión de usuarios, roles y permisos
 
-### 2. Desarrollo Local
+Inventario, ventas, proveedores y pedidos
 
-```bash
-# Instalar dependencias
+Auditoría, logging y seguridad avanzada
+
+Soporta MySQL y PostgreSQL, con arquitectura desacoplada por capas y preparado para integrarse con frontend y otros microservicios.
+
+✨ Características Principales
+🔐 Autenticación y Autorización
+
+JWT (Access + Refresh Tokens)
+
+Roles y permisos granulares
+
+Recuperación y cambio de contraseña
+
+Perfil de usuario
+
+Protección contra fuerza bruta
+
+🛡️ Seguridad
+
+Bcrypt para hash de contraseñas
+
+Rate Limiting
+
+Helmet y CORS
+
+Validación de datos con Joi
+
+Sanitización de inputs
+
+📦 Gestión Comercial
+
+Usuarios (admin / supervisor)
+
+Inventario
+
+Ventas
+
+Proveedores
+
+Pedidos
+
+Códigos QR
+
+Objetos personalizados
+
+📊 Auditoría y Monitoreo
+
+Logs estructurados con Winston + Morgan
+
+Health checks
+
+Trazabilidad de acciones
+
+🐳 Infraestructura
+
+Docker y Docker Compose
+
+Redis (cache y sesiones)
+
+Nginx (opcional)
+
+PM2 para producción
+
+🛠️ Tecnologías Usadas
+Backend
+
+Node.js 18+
+
+Express.js
+
+MySQL / PostgreSQL
+
+Redis
+
+JWT
+
+Bcrypt
+
+Herramientas
+
+Nodemon
+
+ESLint + Prettier
+
+Jest
+
+Husky
+
+Seguridad & Logging
+
+Helmet
+
+CORS
+
+Rate Limit
+
+Winston
+
+Morgan
+
+📁 Estructura del Proyecto
+src/
+├── app.js
+├── config/
+│   ├── database.js
+│   ├── jwt.js
+│   └── environment.js
+├── controllers/
+├── routes/
+├── services/
+├── middleware/
+├── models/
+├── utils/
+├── tests/
+├── docs/
+└── logs/
+
+📡 API Endpoints
+🔐 Autenticación
+POST   /api/auth/register
+POST   /api/auth/login
+POST   /api/auth/logout
+POST   /api/auth/refresh
+GET    /api/auth/me
+GET    /api/auth/profile
+PUT    /api/auth/profile
+POST   /api/auth/forgot-password
+POST   /api/auth/reset-password
+
+👥 Usuarios (Admin / Supervisor)
+GET    /api/users
+POST   /api/users
+GET    /api/users/:id
+PUT    /api/users/:id
+PATCH  /api/users/:id/activate
+PATCH  /api/users/:id/deactivate
+
+📦 Inventario
+GET    /api/inventory/list
+POST   /api/inventory/create
+GET    /api/inventory/get/:id
+PATCH  /api/inventory/update/:id
+DELETE /api/inventory/delete/:id
+
+💰 Ventas
+GET    /api/sales/list
+POST   /api/sales/create
+GET    /api/sales/get/:id
+GET    /api/sales/get-by-dni/:id
+PATCH  /api/sales/update/:id
+DELETE /api/sales/delete/:id
+
+🚚 Proveedores
+GET    /api/providers/list
+POST   /api/providers/create
+GET    /api/providers/get/:id
+PATCH  /api/providers/update/:id
+DELETE /api/providers/delete/:id
+
+🛒 Pedidos
+GET    /api/orders/list
+POST   /api/orders/create
+GET    /api/orders/get/:id
+PATCH  /api/orders/update/:id
+DELETE /api/orders/delete/:id
+
+📱 QR y Objetos
+POST   /api/qr/create
+GET    /api/qr/list
+DELETE /api/qr/delete/:id
+
+POST   /api/objects/create
+GET    /api/objects/get/:id
+DELETE /api/objects/delete/:id
+
+🚀 Inicio Rápido
+1️⃣ Instalación
 npm install
 
-# Crear directorios de datos
-mkdir -p data/postgres data/redis
-
-# Iniciar servicios con Docker Compose
-docker-compose --profile development up -d
-
-# Verificar que los servicios estén ejecutándose
-docker-compose ps
-
-# Iniciar aplicación en modo desarrollo
-npm run dev
-```
-
-### 3. Acceso a Servicios
-
-- **API**: http://localhost:3002
-- **PgAdmin**: http://localhost:8080 (admin@localhost.com / admin123)
-- **Redis Commander**: http://localhost:8081
-
-## 🔧 Configuración
-
-### Variables de Entorno Principales
-
-```env
-# Aplicación
+2️⃣ Variables de Entorno
 NODE_ENV=development
 PORT=3002
-APP_NAME=Gestión Comercial
 
-# Base de datos
 DB_HOST=localhost
-DB_PORT=5432
+DB_PORT=3306
 DB_NAME=usuarios_service
-DB_USER=postgres
-DB_PASSWORD=tu_password_seguro
+DB_USER=usuario
+DB_PASSWORD=password
 
-# JWT
-JWT_SECRET=tu_jwt_secret_muy_largo_y_seguro
-JWT_REFRESH_SECRET=tu_refresh_secret_muy_largo
-JWT_ACCESS_EXPIRY=7d
-JWT_REFRESH_EXPIRY=7d
+JWT_SECRET=super_secret_key
+JWT_REFRESH_SECRET=refresh_secret_key
 
-# Email
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_USER=tu_email@gmail.com
-EMAIL_PASS=tu_app_password
-```
+CORS_ALLOWED_ORIGINS=http://localhost:3000
 
-## 📡 API Endpoints
+3️⃣ Ejecutar
+npm run dev
 
-### Autenticación
 
-```http
-POST /api/auth/register          # Registro de usuario
-POST /api/auth/login             # Inicio de sesión
-POST /api/auth/refresh           # Renovar tokens
-POST /api/auth/logout            # Cerrar sesión
-POST /api/auth/verify-email      # Verificar email
-POST /api/auth/forgot-password   # Solicitar reset
-POST /api/auth/reset-password    # Resetear contraseña
-```
+Servidor disponible en:
+👉 http://localhost:3002
 
-### Usuarios
-
-```http
-GET    /api/users                # Listar usuarios (admin)
-GET    /api/users/:id            # Obtener usuario específico
-PUT    /api/users/:id            # Actualizar usuario
-DELETE /api/users/:id            # Eliminar usuario (admin)
-GET    /api/users/profile        # Perfil del usuario autenticado
-PUT    /api/users/profile        # Actualizar perfil propio
-```
-
-### Sistema
-
-```http
-GET /api/health                  # Health check
-GET /api/status                  # Estado detallado
-```
-
-## 🧪 Testing
-
-```bash
-# Ejecutar todos los tests
+👥 Usuarios de Prueba
+Rol	Email	Contraseña
+Tienda	prueba@techderos.com
+	Password123!
+Admin	admin@gestioncomercial.com
+	Admin123!
+Vendedor	vendedor@gestioncomercial.com
+	Test123!
+🧪 Testing
 npm test
-
-# Tests unitarios solamente
 npm run test:unit
-
-# Tests de integración
 npm run test:integration
-
-# Coverage report
 npm run test:coverage
 
-# Tests en modo watch
-npm run test:watch
-```
-
-## 🚀 Despliegue
-
-### Desarrollo
-
-```bash
-# Iniciar servicios completos de desarrollo
+🚀 Despliegue
+Desarrollo
 docker-compose --profile development up -d
 
-# Ver logs en tiempo real
-docker-compose logs -f usuarios-service
-```
-
-### Producción
-
-```bash
-# Configurar variables de entorno de producción
-export NODE_ENV=production
-export JWT_SECRET="tu_secret_super_seguro_de_produccion"
-export DB_PASSWORD="password_de_bd_super_seguro"
-
-# Iniciar servicios de producción
+Producción
 docker-compose up -d
 
-# Verificar estado
-docker-compose ps
-```
+🔒 Seguridad
 
-## 👥 Usuarios de Prueba
+Cambiar secrets en producción
 
-El sistema se inicializa con los siguientes usuarios:
+Usar HTTPS
 
-| Email | Contraseña | Rol | Descripción |
-|-------|------------|-----|-------------|
-| admin@gestioncomercial.com | Admin123! | superadmin | Super administrador |
-| administrador@gestioncomercial.com | Test123! | admin | Administrador |
-| gerente@gestioncomercial.com | Test123! | gerente | Gerente comercial |
-| vendedor@gestioncomercial.com | Test123! | vendedor | Vendedor |
-| cliente@example.com | Test123! | cliente | Cliente final |
+Configurar CORS correctamente
 
-## 🔒 Seguridad
+Revisar logs periódicamente
 
-### Configuración de Producción
+🤝 Contribución
 
-1. **Cambiar todos los secrets por defecto**
-2. **Usar contraseñas fuertes para BD**
-3. **Configurar CORS correctamente**
-4. **Habilitar HTTPS**
-5. **Revisar logs regularmente**
+Fork del proyecto
 
-### Rate Limiting
+Crear rama feature
 
-- **Login**: 5 intentos por IP cada 15 minutos
-- **API General**: 100 requests por IP cada 15 minutos
-- **Registration**: 3 registros por IP cada hora
+Commit con descripción clara
 
-## 📊 Monitoreo
+Pull Request
 
-### Logs
+📝 Licencia
 
-```bash
-# Ver logs de la aplicación
-docker-compose logs -f usuarios-service
+Licencia MIT
 
-# Ver logs de PostgreSQL
-docker-compose logs -f postgres
-
-# Ver logs de Redis
-docker-compose logs -f redis
-```
-
-### Health Checks
-
-```bash
-# Verificar estado de la API
-curl http://localhost:3002/api/health
-
-# Verificar estado detallado
-curl http://localhost:3002/api/status
-```
-
-## 🛠️ Desarrollo
-
-### Comandos Útiles
-
-```bash
-# Instalar nueva dependencia
-npm install nueva-dependencia
-
-# Ejecutar linting
-npm run lint
-
-# Formatear código
-npm run format
-
-# Conectar a PostgreSQL
-docker exec -it usuarios-postgres psql -U postgres -d usuarios_service
-
-# Conectar a Redis
-docker exec -it usuarios-redis redis-cli
-```
-
-### Scripts de Base de Datos
-
-```bash
-# Hacer backup
-docker exec usuarios-postgres pg_dump -U postgres usuarios_service > backup.sql
-
-# Restaurar backup
-docker exec -i usuarios-postgres psql -U postgres usuarios_service < backup.sql
-```
-
-## 🤝 Contribución
-
-1. Fork el proyecto
-2. Crear rama de feature (`git checkout -b feature/nueva-funcionalidad`)
-3. Commit los cambios (`git commit -am 'Agregar nueva funcionalidad'`)
-4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-5. Crear Pull Request
-
-## 📝 Licencia
-
-Este proyecto está bajo la Licencia MIT. Ver `LICENSE` para más detalles.
-
-## 🆘 Soporte
-
-Para soporte y preguntas:
-
-- **Issues**: Usar GitHub Issues para bugs y features
-- **Documentación**: Ver carpeta `docs/` para documentación adicional
-- **Email**: contacto@gestioncomercial.com
-
----
-
-**Desarrollado con ❤️ para sistemas de gestión comercial**
+Desarrollado con ❤️ para sistemas de gestión comercial – Techderos
