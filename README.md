@@ -1,224 +1,128 @@
-🚀 Gestión Comercial – Microservicio de Usuarios (Techderos Backend)
+Perfecto, ya te entendí 👍
+Te lo dejo **ordenado, limpio y fluido**, con formato **README profesional**, sin verse como columnas ni tablas innecesarias, usando párrafos claros y secciones bien jerarquizadas.
 
-Backend robusto y escalable para gestión comercial, autenticación y administración de usuarios.
-Este microservicio hace parte del ecosistema Techderos, integrando usuarios, roles, inventario, ventas y lógica core, preparado para desarrollo local y producción.
+Puedes copiarlo **tal cual** como `README.md`.
 
-📋 Tabla de Contenidos
+---
 
-Descripción General
+# 🚀 Gestión Comercial – Microservicio de Usuarios (Techderos Backend)
 
-Características Principales
+Backend robusto y escalable para sistemas de **gestión comercial**, desarrollado con **Node.js y Express**.
+Este microservicio forma parte del ecosistema **Techderos** y centraliza la autenticación, gestión de usuarios, roles y la lógica principal del negocio, facilitando la integración con frontend y otros servicios.
 
-Tecnologías Usadas
+---
 
-Estructura del Proyecto
+## 📌 Descripción General
 
-API Endpoints
+El microservicio se encarga de manejar:
 
-Inicio Rápido
+* Autenticación y autorización de usuarios
+* Roles y permisos granulares
+* Gestión de inventario, ventas, proveedores y pedidos
+* Seguridad, auditoría y monitoreo
 
-Configuración
+Está diseñado bajo una **arquitectura por capas**, soporta **MySQL y PostgreSQL**, y puede ejecutarse tanto en entornos locales como productivos mediante Docker.
 
-Usuarios de Prueba
+---
 
-Testing
+## ✨ Características Principales
 
-Despliegue
+### Autenticación y Autorización
 
-Seguridad
+Implementa JWT con access y refresh tokens, control de sesión, recuperación de contraseña, gestión de perfil y protección contra ataques de fuerza bruta.
 
-Contribución
+### Seguridad
 
-📌 Descripción General
+Incluye hash de contraseñas con Bcrypt, rate limiting, headers de seguridad con Helmet, configuración segura de CORS y validación de datos mediante Joi.
 
-Microservicio backend desarrollado con Node.js y Express, encargado de:
+### Gestión Comercial
 
-Autenticación y autorización con JWT
+Permite administrar usuarios, inventario, ventas, proveedores, pedidos, generación de códigos QR y manejo de objetos personalizados del sistema.
 
-Gestión de usuarios, roles y permisos
+### Auditoría y Monitoreo
 
-Inventario, ventas, proveedores y pedidos
+Cuenta con logging estructurado, trazabilidad de acciones, health checks y endpoints de estado para monitoreo del servicio.
 
-Auditoría, logging y seguridad avanzada
+### Infraestructura
 
-Soporta MySQL y PostgreSQL, con arquitectura desacoplada por capas y preparado para integrarse con frontend y otros microservicios.
+Preparado para Docker y Docker Compose, con soporte para Redis, Nginx y PM2 en producción.
 
-✨ Características Principales
-🔐 Autenticación y Autorización
+---
 
-JWT (Access + Refresh Tokens)
+## 🛠️ Tecnologías Utilizadas
 
-Roles y permisos granulares
+El backend está construido sobre Node.js 18+ con Express.
+La base de datos puede ser MySQL o PostgreSQL, usando conexiones optimizadas por pool.
+Se utiliza Redis para cache y sesiones, JWT para autenticación, Winston y Morgan para logging, y herramientas modernas como ESLint, Prettier y Jest para desarrollo y testing.
 
-Recuperación y cambio de contraseña
+---
 
-Perfil de usuario
+## 📁 Estructura del Proyecto
 
-Protección contra fuerza bruta
-
-🛡️ Seguridad
-
-Bcrypt para hash de contraseñas
-
-Rate Limiting
-
-Helmet y CORS
-
-Validación de datos con Joi
-
-Sanitización de inputs
-
-📦 Gestión Comercial
-
-Usuarios (admin / supervisor)
-
-Inventario
-
-Ventas
-
-Proveedores
-
-Pedidos
-
-Códigos QR
-
-Objetos personalizados
-
-📊 Auditoría y Monitoreo
-
-Logs estructurados con Winston + Morgan
-
-Health checks
-
-Trazabilidad de acciones
-
-🐳 Infraestructura
-
-Docker y Docker Compose
-
-Redis (cache y sesiones)
-
-Nginx (opcional)
-
-PM2 para producción
-
-🛠️ Tecnologías Usadas
-Backend
-
-Node.js 18+
-
-Express.js
-
-MySQL / PostgreSQL
-
-Redis
-
-JWT
-
-Bcrypt
-
-Herramientas
-
-Nodemon
-
-ESLint + Prettier
-
-Jest
-
-Husky
-
-Seguridad & Logging
-
-Helmet
-
-CORS
-
-Rate Limit
-
-Winston
-
-Morgan
-
-📁 Estructura del Proyecto
+```
 src/
 ├── app.js
-├── config/
-│   ├── database.js
-│   ├── jwt.js
-│   └── environment.js
-├── controllers/
-├── routes/
-├── services/
-├── middleware/
-├── models/
-├── utils/
-├── tests/
-├── docs/
-└── logs/
+├── config/          # Configuración de entorno, BD y JWT
+├── controllers/     # Controladores REST
+├── routes/          # Definición de rutas
+├── services/        # Lógica de negocio
+├── middleware/      # Autenticación, validaciones y seguridad
+├── models/          # Modelos de datos
+├── utils/           # Utilidades y helpers
+├── tests/           # Tests automatizados
+├── docs/            # Documentación
+└── logs/            # Archivos de log
+```
 
-📡 API Endpoints
-🔐 Autenticación
-POST   /api/auth/register
-POST   /api/auth/login
-POST   /api/auth/logout
-POST   /api/auth/refresh
-GET    /api/auth/me
-GET    /api/auth/profile
-PUT    /api/auth/profile
-POST   /api/auth/forgot-password
-POST   /api/auth/reset-password
+---
 
-👥 Usuarios (Admin / Supervisor)
-GET    /api/users
-POST   /api/users
-GET    /api/users/:id
-PUT    /api/users/:id
-PATCH  /api/users/:id/activate
-PATCH  /api/users/:id/deactivate
+## 📡 API Endpoints
 
-📦 Inventario
-GET    /api/inventory/list
-POST   /api/inventory/create
-GET    /api/inventory/get/:id
-PATCH  /api/inventory/update/:id
-DELETE /api/inventory/delete/:id
+### Autenticación
 
-💰 Ventas
-GET    /api/sales/list
-POST   /api/sales/create
-GET    /api/sales/get/:id
-GET    /api/sales/get-by-dni/:id
-PATCH  /api/sales/update/:id
-DELETE /api/sales/delete/:id
+Permite el registro, inicio de sesión, cierre de sesión, renovación de tokens, recuperación de contraseña y gestión del perfil del usuario autenticado.
 
-🚚 Proveedores
-GET    /api/providers/list
-POST   /api/providers/create
-GET    /api/providers/get/:id
-PATCH  /api/providers/update/:id
-DELETE /api/providers/delete/:id
+### Usuarios
 
-🛒 Pedidos
-GET    /api/orders/list
-POST   /api/orders/create
-GET    /api/orders/get/:id
-PATCH  /api/orders/update/:id
-DELETE /api/orders/delete/:id
+Incluye operaciones administrativas para crear, listar, actualizar, activar o desactivar usuarios, según roles y permisos.
 
-📱 QR y Objetos
-POST   /api/qr/create
-GET    /api/qr/list
-DELETE /api/qr/delete/:id
+### Inventario
 
-POST   /api/objects/create
-GET    /api/objects/get/:id
-DELETE /api/objects/delete/:id
+Gestiona productos, stock y actualización de información relacionada con los artículos del sistema.
 
-🚀 Inicio Rápido
-1️⃣ Instalación
+### Ventas
+
+Registra, consulta, actualiza y anula ventas, incluyendo búsquedas por cliente.
+
+### Proveedores y Pedidos
+
+Permite la administración completa de proveedores y pedidos asociados al flujo comercial.
+
+### QR y Objetos
+
+Incluye generación y gestión de códigos QR y objetos personalizados.
+
+---
+
+## 🚀 Inicio Rápido
+
+### Requisitos Previos
+
+* Node.js 18 o superior
+* MySQL o PostgreSQL
+* Docker (opcional, recomendado)
+
+### Instalación
+
+```bash
 npm install
+```
 
-2️⃣ Variables de Entorno
+### Configuración de Entorno
+
+Crea un archivo `.env` en la raíz del proyecto y define las variables principales:
+
+```env
 NODE_ENV=development
 PORT=3002
 
@@ -228,61 +132,85 @@ DB_NAME=usuarios_service
 DB_USER=usuario
 DB_PASSWORD=password
 
-JWT_SECRET=super_secret_key
-JWT_REFRESH_SECRET=refresh_secret_key
-
+JWT_SECRET=tu_secret_seguro
+JWT_REFRESH_SECRET=tu_refresh_secret
 CORS_ALLOWED_ORIGINS=http://localhost:3000
+```
 
-3️⃣ Ejecutar
+### Ejecución en Desarrollo
+
+```bash
 npm run dev
+```
 
+El servidor estará disponible en `http://localhost:3002`.
 
-Servidor disponible en:
-👉 http://localhost:3002
+---
 
-👥 Usuarios de Prueba
-Rol	Email	Contraseña
-Tienda	prueba@techderos.com
-	Password123!
-Admin	admin@gestioncomercial.com
-	Admin123!
-Vendedor	vendedor@gestioncomercial.com
-	Test123!
-🧪 Testing
+## 👥 Usuarios de Prueba
+
+Para facilitar el desarrollo, el sistema incluye usuarios iniciales para pruebas de autenticación y roles.
+Las credenciales pueden modificarse o eliminarse según el entorno.
+
+---
+
+## 🧪 Testing
+
+El proyecto cuenta con pruebas unitarias e integrales:
+
+```bash
 npm test
 npm run test:unit
 npm run test:integration
 npm run test:coverage
+```
 
-🚀 Despliegue
-Desarrollo
+---
+
+## 🚀 Despliegue
+
+### Desarrollo con Docker
+
+```bash
 docker-compose --profile development up -d
+```
 
-Producción
+### Producción
+
+Configura las variables de entorno de producción y ejecuta:
+
+```bash
 docker-compose up -d
+```
 
-🔒 Seguridad
+---
 
-Cambiar secrets en producción
+## 🔒 Seguridad
 
-Usar HTTPS
+Antes de pasar a producción se recomienda:
 
-Configurar CORS correctamente
+* Cambiar todos los secretos por defecto
+* Configurar correctamente CORS
+* Habilitar HTTPS
+* Revisar periódicamente los logs y métricas
 
-Revisar logs periódicamente
+---
 
-🤝 Contribución
+## 🤝 Contribución
 
-Fork del proyecto
+1. Realiza un fork del proyecto
+2. Crea una rama para tu funcionalidad
+3. Realiza commits claros y descriptivos
+4. Envía un Pull Request
 
-Crear rama feature
-
-Commit con descripción clara
-
-Pull Request
 
 📝 Licencia
 
-Licencia MIT
+Este proyecto se distribuye bajo la licencia MIT.
 
-Desarrollado con ❤️ para sistemas de gestión comercial – Techderos
+
+
+**Desarrollado con ❤️ para sistemas de gestión comercial – Techderos**
+
+
+Solo dime.
