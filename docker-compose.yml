@@ -15,12 +15,14 @@ services:
     expose:
       - ${PORT_SERVER:-}
     environment:
+      # App config
+      - PORT=${PORT_SERVER:-3002}
       # Database config
       - DB_HOST=${DB_HOST:-}
       - DB_USER=${DB_USER:-}
       - DB_PASSWORD=${DB_PASSWORD:-}
       - DB_NAME=${DB_NAME:-}
-      - DB_PORT=${DB_PORT:-}
+      - DB_PORT=3306
       - DB_POOL_MAX=${DB_POOL_MAX:-}
       - DB_POOL_MIN=${DB_POOL_MIN:-}
       - DB_IDLE_TIMEOUT=${DB_IDLE_TIMEOUT:-}
@@ -39,7 +41,7 @@ services:
       - MYSQL_USER=${DB_USER:-}
       - MYSQL_PASSWORD=${DB_PASSWORD:-}
     ports:
-      - ${DB_PORT:-}:${DB_PORT:-}
+      - ${DB_PORT:-3306}:3306
     volumes:
       - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
     command: --default-authentication-plugin=mysql_native_password
